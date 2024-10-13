@@ -18,3 +18,5 @@ build
 !.yarn/sdks
 !.yarn/versions
 yarn.lock
+
+requests.http
