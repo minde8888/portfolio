@@ -4,7 +4,7 @@ import { container } from "../../infrastructure/di/container";
 import { userSchema } from "../middlewares/validateRequest";
 
 export default (router: Router): void => {
-  const userController = container();
+  const { createUser, getAllUsers, getUserById } = container();
 
   router.post(
     "/v1/users",
@@ -17,11 +17,10 @@ export default (router: Router): void => {
         }
       },
     }),
-    (req, res) => userController.createUser(req, res)
+    createUser
   );
 
-  router.get(
-    "/v1/users",
-    (req, res) => userController.getAllUsers(req, res)
-  );
+  router.get("/v1/users", getAllUsers);
+
+  router.get("/v1/users/:id", getUserById);
 };

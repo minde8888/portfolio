@@ -1,34 +1,51 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { CreateUserUseCase } from "../../application/useCases/CreateUserUseCase";
 import { GetAllUsersUseCase } from "../../application/useCases/GetAllUsersUseCase";
+import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
+import { UserNotFoundError, ValidationError } from "../../utils/errors";
 
 export class UserController {
-  private readonly createUserUseCase: CreateUserUseCase;
-  private readonly getAllUsersUseCase: GetAllUsersUseCase;
-
   constructor(
-    createUserUseCase: CreateUserUseCase,
-    getAllUsersUseCase: GetAllUsersUseCase
-  ) {
-    this.createUserUseCase = createUserUseCase;
-    this.getAllUsersUseCase = getAllUsersUseCase;
-  }
+    private readonly createUserUseCase: CreateUserUseCase,
+    private readonly getAllUsersUseCase: GetAllUsersUseCase,
+    private readonly getUserByIdUseCase: GetUserByIdUseCase
+  ) {}
 
-  async createUser(req: Request, res: Response): Promise<void> {
-    const { email, name } = req.body;
+  createUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { email, name } = req.body;
+      
+      if (!email || !name) {
+        throw new ValidationError("Email and name are required");
+      }
 
-    const user = await this.createUserUseCase.execute(email, name);
+      const user = await this.createUserUseCase.execute(email, name);
+      res.status(201).json(user);
+    } catch (error) {
+      next(error);
+    }
+  };
 
-    res.status(201).json(user);
-  }
-
-  async getAllUsers(req: Request, res: Response): Promise<void> {
+  getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const users = await this.getAllUsersUseCase.execute();
       res.status(200).json(users);
     } catch (error) {
-      console.error("Error getting all users:", error);
-      res.status(500).json({ error: "Internal server error" });
+      next(error);
     }
-  }
+  };
+
+  getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) {
+        throw new ValidationError("Invalid user ID");
+      }
+
+      const user = await this.getUserByIdUseCase.execute(id);
+      res.status(200).json(user);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
