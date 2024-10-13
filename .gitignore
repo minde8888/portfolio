@@ -19,4 +19,4 @@ build
 !.yarn/versions
 yarn.lock
 
-requests.http
+request.http

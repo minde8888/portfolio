@@ -1,4 +1,4 @@
-import { UserAlreadyExistsError } from "src/utils/errors";
+import { UserAlreadyExistsError } from "../../utils/errors";
 import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 

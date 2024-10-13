@@ -1,7 +1,7 @@
-import { Repository } from 'typeorm';
-import { IUserRepository } from '../../domain/repositories/IUserRepository';
-import { User } from '../../domain/entities/User';
-import { UserEntity } from '../entities/UserEntity';
+import { Repository } from "typeorm";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { User } from "../../domain/entities/User";
+import { UserEntity } from "../entities/UserEntity";
 
 export class TypeORMUserRepository implements IUserRepository {
   constructor(private readonly repository: Repository<UserEntity>) {}
@@ -25,5 +25,10 @@ export class TypeORMUserRepository implements IUserRepository {
     });
     const savedEntity = await this.repository.save(userEntity);
     return new User(savedEntity.id, savedEntity.email, savedEntity.name);
+  }
+
+  async getAll(): Promise<User[]> {
+    const userEntities = await this.repository.find();
+    return userEntities.map(entity => new User(entity.id, entity.email, entity.name));
   }
 }
