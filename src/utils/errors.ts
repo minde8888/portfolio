@@ -22,6 +22,12 @@ export class UserNotFoundError extends AppError {
   }
 }
 
+export class UserUpdateError extends AppError {
+  constructor(message: string = "Could not update user") {
+    super(message, 404, "UserUpdateError");
+  }
+}
+
 export class ValidationError extends AppError {
   constructor(message: string = "Validation failed") {
     super(message, 400, "ValidationError");

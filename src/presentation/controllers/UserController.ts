@@ -2,19 +2,25 @@ import { Request, Response, NextFunction } from "express";
 import { CreateUserUseCase } from "../../application/useCases/CreateUserUseCase";
 import { GetAllUsersUseCase } from "../../application/useCases/GetAllUsersUseCase";
 import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
-import { UserNotFoundError, ValidationError } from "../../utils/errors";
+import { ValidationError } from "../../utils/errors";
+import { UpdateUserUseCase } from "../../application/useCases/UpdateUserUseCase";
 
 export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly getAllUsersUseCase: GetAllUsersUseCase,
-    private readonly getUserByIdUseCase: GetUserByIdUseCase
+    private readonly getUserByIdUseCase: GetUserByIdUseCase,
+    private readonly updateUserUseCase: UpdateUserUseCase
   ) {}
 
-  createUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  createUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const { email, name } = req.body;
-      
+
       if (!email || !name) {
         throw new ValidationError("Email and name are required");
       }
@@ -26,7 +32,11 @@ export class UserController {
     }
   };
 
-  getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getAllUsers = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const users = await this.getAllUsersUseCase.execute();
       res.status(200).json(users);
@@ -35,7 +45,11 @@ export class UserController {
     }
   };
 
-  getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getUserById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id, 10);
       if (isNaN(id)) {
@@ -44,6 +58,25 @@ export class UserController {
 
       const user = await this.getUserByIdUseCase.execute(id);
       res.status(200).json(user);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const { email, name } = req.body;
+
+      const updatedUser = await this.updateUserUseCase.execute(id, {
+        email,
+        name,
+      });
+      res.status(200).json(updatedUser);
     } catch (error) {
       next(error);
     }

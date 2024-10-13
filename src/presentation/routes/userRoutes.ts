@@ -1,26 +1,30 @@
 import { Router } from "express";
 import { expressYupMiddleware } from 'express-yup-middleware';
 import { container } from "../../infrastructure/di/container";
-import { userSchema } from "../middlewares/validateRequest";
+import { userSchema, userUpdateSchema } from "../middlewares/validateRequest";
 
 export default (router: Router): void => {
-  const { createUser, getAllUsers, getUserById } = container();
+  const { createUser, getAllUsers, getUserById, updateUser } = container();
+
+  const validateBody = (schema: any) => expressYupMiddleware({
+    schemaValidator: {
+      schema: schema
+    },
+  });
 
   router.post(
     "/v1/users",
-    expressYupMiddleware({
-      schemaValidator: {
-        schema: {
-          body: {
-            yupSchema: userSchema
-          }
-        }
-      },
-    }),
+    validateBody(userSchema),
     createUser
   );
 
   router.get("/v1/users", getAllUsers);
 
   router.get("/v1/users/:id", getUserById);
+
+  router.put(
+    "/v1/users/:id",
+    validateBody(userUpdateSchema),
+    updateUser
+  );
 };
