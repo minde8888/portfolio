@@ -6,4 +6,5 @@ export interface IUserRepository {
   save(user: User): Promise<User>;
   getAll(): Promise<User[] | undefined>;
   update(user: User): Promise<User>;
+  remove(id:number): Promise<void> ;
 }

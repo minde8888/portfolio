@@ -4,7 +4,7 @@ import { container } from "../../infrastructure/di/container";
 import { userSchema, userUpdateSchema } from "../middlewares/validateRequest";
 
 export default (router: Router): void => {
-  const { createUser, getAllUsers, getUserById, updateUser } = container();
+  const { createUser, getAllUsers, getUserById, updateUser, removeUser } = container();
 
   const validateBody = (schema: any) => expressYupMiddleware({
     schemaValidator: {
@@ -27,4 +27,6 @@ export default (router: Router): void => {
     validateBody(userUpdateSchema),
     updateUser
   );
+
+  router.delete("/v1/users/:id", removeUser);
 };

@@ -6,6 +6,7 @@ import { UserController } from "../../presentation/controllers/UserController";
 import { AppDataSource } from "../../infrastructure/config/database";
 import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
 import { UpdateUserUseCase } from "../../application/useCases/UpdateUserUseCase";
+import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase";
 
 export function container(): UserController {
   const userRepository = new TypeORMUserRepository(
@@ -15,6 +16,13 @@ export function container(): UserController {
   const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
   const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
-  
-  return new UserController(createUserUseCase, getAllUsersUseCase, getUserByIdUseCase, updateUserUseCase);
+  const removeUserUseCase = new RemoveUserUseCase(userRepository);
+
+  return new UserController(
+    createUserUseCase,
+    getAllUsersUseCase,
+    getUserByIdUseCase,
+    updateUserUseCase,
+    removeUserUseCase
+  );
 }

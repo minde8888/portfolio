@@ -2,7 +2,7 @@ import { Repository } from "typeorm";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
 import { UserEntity } from "../entities/UserEntity";
-import { UserUpdateError } from "../../utils/errors";
+import { UserNotFoundError, UserUpdateError } from "../../utils/errors";
 
 export class TypeORMUserRepository implements IUserRepository {
   constructor(private readonly repository: Repository<UserEntity>) {}
@@ -30,14 +30,17 @@ export class TypeORMUserRepository implements IUserRepository {
 
   async getAll(): Promise<User[]> {
     const userEntities = await this.repository.find();
-    return userEntities.map(entity => new User(entity.id, entity.email, entity.name));
+    return userEntities.map(
+      (entity) => new User(entity.id, entity.email, entity.name)
+    );
   }
 
   async update(user: User): Promise<User> {
+    const existingUserEntity = await this.repository.findOne({
+      where: { id: user.id },
+    });
 
-    const existingUserEntity = await this.repository.findOne({ where: { id: user.id } });
-
-    if(!existingUserEntity) throw new UserUpdateError();
+    if (!existingUserEntity) throw new UserUpdateError();
 
     existingUserEntity.email = user.email;
     existingUserEntity.name = user.name;
@@ -45,5 +48,12 @@ export class TypeORMUserRepository implements IUserRepository {
     const updatedEntity = await this.repository.save(existingUserEntity);
 
     return new User(updatedEntity.id, updatedEntity.email, updatedEntity.name);
+  }
+
+  async remove(id: number): Promise<void> {
+    const result = await this.repository.delete(id);
+    if (result.affected === 0) {
+      throw new UserNotFoundError(`User with id ${id} not found`);
+    }
   }
 }

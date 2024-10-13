@@ -4,13 +4,15 @@ import { GetAllUsersUseCase } from "../../application/useCases/GetAllUsersUseCas
 import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
 import { ValidationError } from "../../utils/errors";
 import { UpdateUserUseCase } from "../../application/useCases/UpdateUserUseCase";
+import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase";
 
 export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly getAllUsersUseCase: GetAllUsersUseCase,
     private readonly getUserByIdUseCase: GetUserByIdUseCase,
-    private readonly updateUserUseCase: UpdateUserUseCase
+    private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly removeUserUseCase: RemoveUserUseCase
   ) {}
 
   createUser = async (
@@ -77,6 +79,24 @@ export class UserController {
         name,
       });
       res.status(200).json(updatedUser);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  removeUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        throw new ValidationError("Invalid user ID");
+      }
+
+      const user = await this.removeUserUseCase.execute(id);
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }
