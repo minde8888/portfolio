@@ -8,7 +8,10 @@ import { AppDataSource } from "../../infrastructure/config/database";
 import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
 import { UpdateUserUseCase } from "../../application/useCases/UpdateUserUseCase";
 import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase";
-import { ICacheService } from "../../application/interfaces/ICacheService";
+import { ICacheService } from "../../domain/services/ICacheService";
+import { JwtAuthService } from '../auth/JwtAuthService';
+import { LoginUseCase } from '../../application/useCases/auth/LoginUseCase';
+import { RegisterUseCase } from '../../application/useCases/auth/RegisterUseCase';
 
 export function container(): UserController {
   const userRepository = new TypeORMUserRepository(
@@ -25,12 +28,17 @@ export function container(): UserController {
   );
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const removeUserUseCase = new RemoveUserUseCase(userRepository);
+  const authService = new JwtAuthService(userRepository);
+  const loginUseCase = new LoginUseCase(userRepository, authService);
+  const registerUseCase = new RegisterUseCase(userRepository);
 
   return new UserController(
     createUserUseCase,
     getAllUsersUseCase,
     getUserByIdUseCase,
     updateUserUseCase,
-    removeUserUseCase
+    removeUserUseCase,
+    loginUseCase,
+    registerUseCase
   );
 }

@@ -12,6 +12,8 @@
     "migration:revert": "npm run typeorm migration:revert -- -d ./src/infrastructure/config/database.ts"
   },
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.7",
+    "bcrypt": "^5.1.1",
     "express": "^4.17.1",
     "express-yup-middleware": "^1.2.4",
     "pg": "^8.7.1",
@@ -22,6 +24,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.13",
     "@types/node": "^16.11.12",
     "nodemon": "^2.0.15",

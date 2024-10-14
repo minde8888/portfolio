@@ -1,7 +1,7 @@
 import { UserNotFoundError, ValidationError } from "../../utils/Errors";
 import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { ICacheService } from "../interfaces/ICacheService";
+import { ICacheService } from "../../domain/services/ICacheService";
 
 export class GetUserByIdUseCase {
   constructor(
