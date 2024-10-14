@@ -1,4 +1,4 @@
-import { UserNotFoundError, UserUpdateError } from "../../utils/errors";
+import { UserNotFoundError, UserUpdateError } from "../../utils/Errors";
 import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 

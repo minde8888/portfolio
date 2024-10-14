@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { CreateUserUseCase } from "../../application/useCases/CreateUserUseCase";
 import { GetAllUsersUseCase } from "../../application/useCases/GetAllUsersUseCase";
 import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
-import { ValidationError } from "../../utils/errors";
+import { ValidationError } from "../../utils/Errors";
 import { UpdateUserUseCase } from "../../application/useCases/UpdateUserUseCase";
 import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase";
 
@@ -22,10 +22,6 @@ export class UserController {
   ): Promise<void> => {
     try {
       const { email, name } = req.body;
-
-      if (!email || !name) {
-        throw new ValidationError("Email and name are required");
-      }
 
       const user = await this.createUserUseCase.execute(email, name);
       res.status(201).json(user);
@@ -54,9 +50,6 @@ export class UserController {
   ): Promise<void> => {
     try {
       const id = parseInt(req.params.id, 10);
-      if (isNaN(id)) {
-        throw new ValidationError("Invalid user ID");
-      }
 
       const user = await this.getUserByIdUseCase.execute(id);
       res.status(200).json(user);
@@ -91,10 +84,6 @@ export class UserController {
   ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        throw new ValidationError("Invalid user ID");
-      }
-
       const user = await this.removeUserUseCase.execute(id);
       res.status(200).json(user);
     } catch (error) {

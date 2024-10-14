@@ -33,3 +33,9 @@ export class ValidationError extends AppError {
     super(message, 400, "ValidationError");
   }
 }
+
+export class RedisError extends AppError {
+  constructor(message: string) {
+    super(message, 500, "RedisError");
+  }
+}

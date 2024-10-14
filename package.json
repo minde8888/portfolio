@@ -15,6 +15,7 @@
     "express": "^4.17.1",
     "express-yup-middleware": "^1.2.4",
     "pg": "^8.7.1",
+    "redis": "^4.7.0",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.8.0",
     "typeorm": "^0.3.20",

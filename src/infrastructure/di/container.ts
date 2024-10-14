@@ -1,3 +1,4 @@
+import { ConfigurableCache } from '../cache/ConfigurableCache';
 import { CreateUserUseCase } from "../../application/useCases/CreateUserUseCase";
 import { GetAllUsersUseCase } from "../../application/useCases/GetAllUsersUseCase";
 import { UserEntity } from "../entities/UserEntity";
@@ -7,14 +8,21 @@ import { AppDataSource } from "../../infrastructure/config/database";
 import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
 import { UpdateUserUseCase } from "../../application/useCases/UpdateUserUseCase";
 import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase";
+import { ICacheService } from "../../application/interfaces/ICacheService";
 
 export function container(): UserController {
   const userRepository = new TypeORMUserRepository(
     AppDataSource.getRepository(UserEntity)
   );
+
+  const cacheService: ICacheService = new ConfigurableCache();
+
   const createUserUseCase = new CreateUserUseCase(userRepository);
   const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
-  const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
+  const getUserByIdUseCase = new GetUserByIdUseCase(
+    userRepository,
+    cacheService
+  );
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const removeUserUseCase = new RemoveUserUseCase(userRepository);
 

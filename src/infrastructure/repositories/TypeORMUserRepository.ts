@@ -2,7 +2,7 @@ import { Repository } from "typeorm";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
 import { UserEntity } from "../entities/UserEntity";
-import { UserNotFoundError, UserUpdateError } from "../../utils/errors";
+import { UserNotFoundError, UserUpdateError } from "../../utils/Errors";
 
 export class TypeORMUserRepository implements IUserRepository {
   constructor(private readonly repository: Repository<UserEntity>) {}
