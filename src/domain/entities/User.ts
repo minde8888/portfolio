@@ -1,13 +1,13 @@
 export class User {
-  id: number;
-  email: string;
-  password: string;
-  role: string;
-
-  constructor(id: number, email: string, password: string, role: string) {
-    this.id = id;
-    this.email = email;
-    this.password = password;
-    this.role = role;
-  }
+  constructor(
+    public id: number,
+    public email: string,
+    public name: string,
+    public password: string,
+    public role: string,
+    public refreshToken: string | null,
+    public createdAt?: Date,
+    public updatedAt?: Date
+  ) { }
 }
+

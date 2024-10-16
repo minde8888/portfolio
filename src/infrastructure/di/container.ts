@@ -11,7 +11,7 @@ import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase"
 import { ICacheService } from "../../domain/services/ICacheService";
 import { JwtAuthService } from '../auth/JwtAuthService';
 import { LoginUseCase } from '../../application/useCases/auth/LoginUseCase';
-import { RegisterUseCase } from '../../application/useCases/auth/RegisterUseCase';
+import { RegisterUseCase } from '../../application/useCases/auth/RefreshTokenUseCase';
 
 export function container(): UserController {
   const userRepository = new TypeORMUserRepository(
