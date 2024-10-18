@@ -11,34 +11,53 @@ import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase"
 import { ICacheService } from "../../domain/services/ICacheService";
 import { JwtAuthService } from '../auth/JwtAuthService';
 import { LoginUseCase } from '../../application/useCases/auth/LoginUseCase';
-import { RegisterUseCase } from '../../application/useCases/auth/RefreshTokenUseCase';
+import { RegisterUseCase } from '../../application/useCases/auth/RegisterUseCase';
+import { TypeORMAuthRepository } from '../repositories/TypeORMAuthRepository';
+import { AuthEntity } from '../entities/AuthEntity';
+import { AuthController } from '../..//presentation/controllers/AuthController';
+import { IAuthService } from '../../domain/services/IAuthService';
+import { RefreshTokenUseCase } from '../../application/useCases/auth/RefreshTokenUseCase';
+import { IContainerResult } from '../interfaces/IContainerResult';
 
-export function container(): UserController {
+export function container(): IContainerResult {
   const userRepository = new TypeORMUserRepository(
     AppDataSource.getRepository(UserEntity)
   );
 
-  const cacheService: ICacheService = new ConfigurableCache();
+  const authRepository = new TypeORMAuthRepository(
+    AppDataSource.getRepository(AuthEntity)
+  );
 
+  // Services
+  const cacheService: ICacheService = new ConfigurableCache();
+  const authService: IAuthService = new JwtAuthService(authRepository);
+
+  // User Use Cases
   const createUserUseCase = new CreateUserUseCase(userRepository);
   const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
-  const getUserByIdUseCase = new GetUserByIdUseCase(
-    userRepository,
-    cacheService
-  );
+  const getUserByIdUseCase = new GetUserByIdUseCase(userRepository, cacheService);
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const removeUserUseCase = new RemoveUserUseCase(userRepository);
-  const authService = new JwtAuthService(userRepository);
-  const loginUseCase = new LoginUseCase(userRepository, authService);
-  const registerUseCase = new RegisterUseCase(userRepository);
 
-  return new UserController(
+  // Auth Use Cases
+  const loginUseCase = new LoginUseCase(authRepository, authService);
+  const registerUseCase = new RegisterUseCase(authRepository);
+  const refreshTokenUseCase = new RefreshTokenUseCase(authRepository, authService);
+
+  // Controllers
+  const userController = new UserController(
     createUserUseCase,
     getAllUsersUseCase,
     getUserByIdUseCase,
     updateUserUseCase,
-    removeUserUseCase,
-    loginUseCase,
-    registerUseCase
+    removeUserUseCase
   );
+
+  const authController = new AuthController(
+    loginUseCase,
+    registerUseCase,
+    refreshTokenUseCase
+  );
+
+  return { userController, authController };
 }

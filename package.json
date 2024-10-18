@@ -13,9 +13,11 @@
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.7",
+    "automapper-ts": "^1.9.0",
     "bcrypt": "^5.1.1",
     "express": "^4.17.1",
     "express-yup-middleware": "^1.2.4",
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.7.1",
     "redis": "^4.7.0",
     "reflect-metadata": "^0.2.2",

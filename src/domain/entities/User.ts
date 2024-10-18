@@ -5,9 +5,7 @@ export class User {
     public name: string,
     public password: string,
     public role: string,
-    public refreshToken: string | null,
-    public createdAt?: Date,
-    public updatedAt?: Date
+    public refreshToken: string | null
   ) { }
 }
 

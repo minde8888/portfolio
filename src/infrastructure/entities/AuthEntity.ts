@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn } from 'typeorm';
-import { User } from './../../domain/entities/User';
+import { Auth } from '../../domain/entities/Auth';
 
-@Entity('users')
-export class UserEntity {
+@Entity('auth')
+export class AuthEntity {
     @PrimaryGeneratedColumn()
-    id!: number;
+    id!: string;
 
     @Column({ unique: true })
     email!: string;
@@ -22,25 +22,35 @@ export class UserEntity {
     @Column({ nullable: true })
     refreshToken!: string | null;
 
-    toDomain(): User {
-        return new User(
+    @CreateDateColumn()
+    createdAt!: Date;
+
+    @UpdateDateColumn()
+    updatedAt!: Date;
+
+    toDomain(): Auth {
+        return new Auth(
             this.id,
             this.email,
             this.name,
             this.password,
             this.role,
             this.refreshToken,
+            this.createdAt,
+            this.updatedAt
         );
     }
 
-    static fromDomain(user: User): UserEntity {
-        const entity = new UserEntity();
+    static fromDomain(user: Auth): AuthEntity {
+        const entity = new AuthEntity();
         entity.id = user.id;
         entity.email = user.email;
         entity.name = user.name;
         entity.password = user.password;
         entity.role = user.role;
         entity.refreshToken = user.refreshToken;
+        entity.createdAt = user.createdAt ?? new Date();
+        entity.updatedAt = user.updatedAt ?? new Date();
 
         return entity;
     }

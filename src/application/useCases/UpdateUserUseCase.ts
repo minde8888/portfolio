@@ -26,6 +26,6 @@ export class UpdateUserUseCase {
       }
     }
 
-    return this.userRepository.update(existingUser);
+    return this.userRepository.update(id, existingUser);
   }
 }

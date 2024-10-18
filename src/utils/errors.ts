@@ -10,9 +10,9 @@
   }
 }
 
-export class UserAlreadyExistsError extends AppError {
-  constructor(message: string = "User already exists") {
-    super(message, 409, "UserAlreadyExistsError");
+export class EmailAlreadyExistsError extends AppError {
+  constructor(message: string = "Email already exists") {
+    super(message, 409, "EmailAlreadyExistsError");
   }
 }
 
@@ -37,5 +37,11 @@ export class ValidationError extends AppError {
 export class RedisError extends AppError {
   constructor(message: string) {
     super(message, 500, "RedisError");
+  }
+}
+export class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AuthError';
   }
 }

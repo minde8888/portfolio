@@ -1,19 +1,19 @@
 import { IAuthService } from './../../../domain/services/IAuthService';
-import { IUserRepository } from './../../../domain/repositories/IUserRepository';
+import { IAuthRepository } from './../../../domain/repositories/IAuthRepository';
 
 export class LoginUseCase {
   constructor(
-    private userRepository: IUserRepository,
+    private authRepository: IAuthRepository,
     private authService: IAuthService
-  ) {}
+  ) { }
 
   async execute(email: string, password: string): Promise<{ accessToken: string; refreshToken: string } | null> {
-    const user = await this.authService.validateUser(email, password);
-    if (user) {
-      const accessToken = this.authService.generateAccessToken(user);
-      const refreshToken = this.authService.generateRefreshToken(user);
-      user.refreshToken = refreshToken;
-      await this.userRepository.update(user.id, { refreshToken });
+    const auth = await this.authService.validateUser(email, password);
+    if (auth) {
+      const accessToken = this.authService.generateAccessToken(auth);
+      const refreshToken = this.authService.generateRefreshToken(auth);
+      auth.refreshToken = refreshToken;
+      await this.authRepository.update(auth.id, { refreshToken });
       return { accessToken, refreshToken };
     }
     return null;

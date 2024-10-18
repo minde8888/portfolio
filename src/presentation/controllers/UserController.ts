@@ -15,20 +15,20 @@ export class UserController {
     private readonly removeUserUseCase: RemoveUserUseCase
   ) {}
 
-  createUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const { email, name } = req.body;
+  // createUser = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ): Promise<void> => {
+  //   try {
+  //     const { email, name } = req.body;
 
-      const user = await this.createUserUseCase.execute(email, name);
-      res.status(201).json(user);
-    } catch (error) {
-      next(error);
-    }
-  };
+  //     const user = await this.createUserUseCase.execute(email, name);
+  //     res.status(201).json(user);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
 
   getAllUsers = async (
     req: Request,

@@ -6,6 +6,12 @@ import { UserNotFoundError, UserUpdateError } from "../../utils/Errors";
 
 export class TypeORMUserRepository implements IUserRepository {
   constructor(private readonly repository: Repository<UserEntity>) {}
+  getAll(): Promise<User[] | undefined> {
+    throw new Error("Method not implemented.");
+  }
+  // remove(id: number): Promise<void> {
+  //   throw new Error("Method not implemented.");
+  // }
 
   async findById(id: number): Promise<User | null> {
     const userEntity = await this.repository.findOne({ where: { id } });
@@ -17,13 +23,13 @@ export class TypeORMUserRepository implements IUserRepository {
   }
 
   async create(user: Omit<User, "id" | "createdAt" | "updatedAt">): Promise<User> {
-    const userEntity = UserEntity.fromDomain(new User(0, user.email, user.name, user.password, user.role, null, new Date(), new Date()));
+    const userEntity = UserEntity.fromDomain(new User(0, user.email, user.name, user.password, user.role, null));
     const savedEntity = await this.repository.save(userEntity);
     return savedEntity.toDomain();
   }
 
   async update(id: number, userData: Partial<User>): Promise<User> {
-    await this.repository.update(id, UserEntity.fromDomain({ ...new User(id, "", "", "", "", null, new Date(), new Date()), ...userData }));
+    await this.repository.update(id, UserEntity.fromDomain({ ...new User(id, "", "", "", "", null), ...userData }));
     const updatedEntity = await this.repository.findOne({ where: { id } });
     if (!updatedEntity) {
       throw new Error("User not found after update");
@@ -53,10 +59,10 @@ export class TypeORMUserRepository implements IUserRepository {
   //   return new User(updatedEntity.id, updatedEntity.email, updatedEntity.name);
   // }
 
-  // async remove(id: number): Promise<void> {
-  //   const result = await this.repository.delete(id);
-  //   if (result.affected === 0) {
-  //     throw new UserNotFoundError(`User with id ${id} not found`);
-  //   }
-  // }
+  async remove(id: number): Promise<void> {
+    const result = await this.repository.delete(id);
+    if (result.affected === 0) {
+      throw new UserNotFoundError(`User with id ${id} not found`);
+    }
+  }
 }
