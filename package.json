@@ -12,8 +12,9 @@
     "migration:revert": "npm run typeorm migration:revert -- -d ./src/infrastructure/config/database.ts"
   },
   "dependencies": {
+    "@automapper/classes": "^8.8.1",
+    "@automapper/core": "^8.8.1",
     "@types/jsonwebtoken": "^9.0.7",
-    "automapper-ts": "^1.9.0",
     "bcrypt": "^5.1.1",
     "express": "^4.17.1",
     "express-yup-middleware": "^1.2.4",

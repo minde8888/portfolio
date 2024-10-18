@@ -16,6 +16,6 @@ export class RegisterUseCase {
             name: name,
             refreshToken: null
         });
-        return parseInt(user.id);
+        return user.id;
     }
 }

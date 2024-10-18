@@ -5,7 +5,7 @@ import { Auth } from '../../domain/entities/Auth';
 @Entity('auth')
 export class AuthEntity {
     @PrimaryGeneratedColumn()
-    id!: string;
+    id!: number;
 
     @Column({ unique: true })
     email!: string;
