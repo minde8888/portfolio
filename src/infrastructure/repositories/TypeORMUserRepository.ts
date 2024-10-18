@@ -23,13 +23,13 @@ export class TypeORMUserRepository implements IUserRepository {
   }
 
   async create(user: Omit<User, "id" | "createdAt" | "updatedAt">): Promise<User> {
-    const userEntity = UserEntity.fromDomain(new User(0, user.email, user.name, user.password, user.role, null));
+    const userEntity = UserEntity.fromDomain(new User(0, user.email, user.name, user.role));
     const savedEntity = await this.repository.save(userEntity);
     return savedEntity.toDomain();
   }
 
   async update(id: number, userData: Partial<User>): Promise<User> {
-    await this.repository.update(id, UserEntity.fromDomain({ ...new User(id, "", "", "", "", null), ...userData }));
+    await this.repository.update(id, UserEntity.fromDomain({ ...new User(id, "", "", ""), ...userData }));
     const updatedEntity = await this.repository.findOne({ where: { id } });
     if (!updatedEntity) {
       throw new Error("User not found after update");

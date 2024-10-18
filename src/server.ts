@@ -1,30 +1,40 @@
 import "reflect-metadata";
 import express from "express";
-import { AppDataSource } from "./infrastructure/config/database";
+import { Database } from "./infrastructure/database/Database";
 import { errorHandler } from "./presentation/middlewares/errorHandler";
 import userRoutes from "./presentation/routes/userRoutes";
 import authRoutes from "./presentation/routes/authRoutes";
 
-const app = express();
+async function bootstrap() {
+  const app = express();
+  const database = new Database();
 
-app.use(express.json());
+  app.use(express.json());
 
-const router = express.Router();
+  const router = express.Router();
 
-userRoutes(router);
-authRoutes(router);
+  userRoutes(router);
+  authRoutes(router);
 
-app.use("/api/", router);
+  app.use("/api/", router);
 
-app.use(errorHandler);
+  app.use(errorHandler);
 
-AppDataSource.initialize()
-  .then(() => {
-    console.log("Database connected");
-    app.listen(3000, () => {
-      console.log("Server is running on port 3000");
+  try {
+    await database.connect();
+
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
     });
-  })
-  .catch((error: any) => console.log(error));
+  } catch (error) {
+    console.error("Failed to start the application:", error);
+    await database.disconnect();
+    process.exit(1);
+  }
+}
 
-
+bootstrap().catch((error) => {
+  console.error("Unhandled error during bootstrap:", error);
+  process.exit(1);
+});

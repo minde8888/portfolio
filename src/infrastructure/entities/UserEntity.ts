@@ -14,9 +14,6 @@ export class UserEntity {
     name!: string;
 
     @Column()
-    password!: string;
-
-    @Column()
     role!: string;
 
     @Column({ nullable: true })
@@ -27,9 +24,7 @@ export class UserEntity {
             this.id,
             this.email,
             this.name,
-            this.password,
             this.role,
-            this.refreshToken,
         );
     }
 
@@ -38,9 +33,7 @@ export class UserEntity {
         entity.id = user.id;
         entity.email = user.email;
         entity.name = user.name;
-        entity.password = user.password;
         entity.role = user.role;
-        entity.refreshToken = user.refreshToken;
 
         return entity;
     }

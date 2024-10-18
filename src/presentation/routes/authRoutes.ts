@@ -2,10 +2,11 @@ import { Router } from "express";
 import { expressYupMiddleware } from 'express-yup-middleware';
 import { container } from "../../infrastructure/di/container";
 import { loginSchema, registerSchema } from "../middlewares/validateRequest";
+import { IContainerResult } from "../../infrastructure/interfaces/IContainerResult";
 
-export default (router: Router): void => {
-  const { authController } = container();
-
+export default async (router: Router): Promise<void> => {
+  // const { authController } = container();
+  const { authController }: IContainerResult = await container();
   const validateBody = (schema: any) => expressYupMiddleware({
     schemaValidator: {
       schema: schema

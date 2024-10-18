@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { container } from '../../infrastructure/di/container';
 import { IDecodedToken } from '../../infrastructure/interfaces/IDecodedToken'; // Adjust if needed
+import { IContainerResult } from '../../infrastructure/interfaces/IContainerResult';
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-  const { authController } = container();
+  // const { authController } = container();
+  const { authController }: IContainerResult = await container();
   const token = extractTokenFromHeader(req);
 
   if (!token) {

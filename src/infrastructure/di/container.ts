@@ -4,7 +4,7 @@ import { GetAllUsersUseCase } from "../../application/useCases/GetAllUsersUseCas
 import { UserEntity } from "../entities/UserEntity";
 import { TypeORMUserRepository } from "../repositories/TypeORMUserRepository";
 import { UserController } from "../../presentation/controllers/UserController";
-import { AppDataSource } from "../../infrastructure/config/database";
+import { Database } from "../database/Database";
 import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
 import { UpdateUserUseCase } from "../../application/useCases/UpdateUserUseCase";
 import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase";
@@ -19,13 +19,19 @@ import { IAuthService } from '../../domain/services/IAuthService';
 import { RefreshTokenUseCase } from '../../application/useCases/auth/RefreshTokenUseCase';
 import { IContainerResult } from '../interfaces/IContainerResult';
 
-export function container(): IContainerResult {
+export async  function container(): Promise<IContainerResult> {
+
+  const database = new Database();
+  await database.connect();
+
+  const dataSource = database.getDataSource();
+
   const userRepository = new TypeORMUserRepository(
-    AppDataSource.getRepository(UserEntity)
+    dataSource.getRepository(UserEntity)
   );
 
   const authRepository = new TypeORMAuthRepository(
-    AppDataSource.getRepository(AuthEntity)
+    dataSource.getRepository(AuthEntity)
   );
 
   // Services
