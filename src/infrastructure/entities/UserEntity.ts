@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn } from 'typeorm';
-import { User } from './../../domain/entities/User';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { User } from '../../domain/entities/User';
 
 @Entity('users')
 export class UserEntity {
@@ -16,7 +16,7 @@ export class UserEntity {
     @Column()
     role!: string;
 
-    @Column({ nullable: true })
+    @Column('text', { nullable: true })
     refreshToken!: string | null;
 
     toDomain(): User {
@@ -25,6 +25,7 @@ export class UserEntity {
             this.email,
             this.name,
             this.role,
+            this.refreshToken
         );
     }
 
@@ -34,6 +35,7 @@ export class UserEntity {
         entity.email = user.email;
         entity.name = user.name;
         entity.role = user.role;
+        entity.refreshToken = user.refreshToken;
 
         return entity;
     }

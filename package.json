@@ -6,10 +6,10 @@
     "start": "ts-node ./src/server.ts",
     "dev": "nodemon ./src/server.ts",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "npm run typeorm migration:generate -- -d ./src/infrastructure/config/database.ts",
-    "migration:create": "npm run typeorm migration:create",
-    "migration:run": "npm run typeorm migration:run -- -d ./src/infrastructure/config/database.ts",
-    "migration:revert": "npm run typeorm migration:revert -- -d ./src/infrastructure/config/database.ts"
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/infrastructure/database/config/AppDataSource.ts",
+    "migration:run": "ts-node src/infrastructure/cli/cli.ts run-migrations",
+    "migration:revert": "npm run typeorm -- migration:revert -d ./src/infrastructure/database/config/AppDataSource.ts",
+    "migration:run:force": "ts-node ./src/infrastructure/cli/cli.ts run-migrations-force"
   },
   "dependencies": {
     "@automapper/classes": "^8.8.1",
@@ -32,6 +32,7 @@
     "@types/express": "^4.17.13",
     "@types/node": "^16.11.12",
     "@types/pg": "^8.11.10",
+    "cross-env": "^7.0.3",
     "nodemon": "^2.0.15",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"

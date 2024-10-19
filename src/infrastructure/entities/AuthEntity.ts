@@ -19,7 +19,7 @@ export class AuthEntity {
     @Column()
     role!: string;
 
-    @Column({ nullable: true })
+    @Column('text', { nullable: true })
     refreshToken!: string | null;
 
     @CreateDateColumn()
@@ -41,16 +41,16 @@ export class AuthEntity {
         );
     }
 
-    static fromDomain(user: Auth): AuthEntity {
+    static fromDomain(auth: Auth): AuthEntity {
         const entity = new AuthEntity();
-        entity.id = user.id;
-        entity.email = user.email;
-        entity.name = user.name;
-        entity.password = user.password;
-        entity.role = user.role;
-        entity.refreshToken = user.refreshToken;
-        entity.createdAt = user.createdAt ?? new Date();
-        entity.updatedAt = user.updatedAt ?? new Date();
+        entity.id = auth.id;
+        entity.email = auth.email;
+        entity.name = auth.name;
+        entity.password = auth.password;
+        entity.role = auth.role;
+        entity.refreshToken = auth.refreshToken;
+        entity.createdAt = auth.createdAt;
+        entity.updatedAt = auth.updatedAt;
 
         return entity;
     }
