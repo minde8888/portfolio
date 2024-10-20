@@ -17,13 +17,13 @@ export class Auth {
   role: string;
 
   @AutoMap()
-  refreshToken: string | null;
-
-  @AutoMap()
   createdAt: Date;
 
   @AutoMap()
   updatedAt: Date;
+
+  @AutoMap()
+  refreshToken: string | null;
 
   constructor(
     id: number,

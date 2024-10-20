@@ -1,114 +1,60 @@
-import { DataSource, Table, MigrationInterface } from "typeorm";
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+import { DataSource } from "typeorm";
+import { MigrationExecutor } from "typeorm/migration/MigrationExecutor";
 
 export class MigrationService {
-    constructor(private dataSource: DataSource) {}
+    constructor(private dataSource: DataSource) { }
 
     async runMigrations(): Promise<void> {
         try {
             if (!this.dataSource.isInitialized) {
-                console.log('Initializing data source...');
                 await this.dataSource.initialize();
             }
 
-            const queryRunner = this.dataSource.createQueryRunner();
+            const migrationExecutor = new MigrationExecutor(this.dataSource);
+            const pendingMigrations = await migrationExecutor.getPendingMigrations();
 
-            await this.ensureMigrationsTable(queryRunner);
-            await this.runPendingMigrations(queryRunner);
-
-            await queryRunner.release();
-
-            console.log('All migrations completed successfully.');
+            if (pendingMigrations.length > 0) {
+                console.log(`Running ${pendingMigrations.length} pending migrations...`);
+                await migrationExecutor.executePendingMigrations();
+                console.log('All pending migrations have been executed.');
+            } else {
+                console.log('No pending migrations.');
+            }
         } catch (error) {
             console.error('Error running migrations:', error);
             throw error;
-        } finally {
-            if (this.dataSource.isInitialized) {
-                await this.dataSource.destroy();
+        }
+    }
+
+    async revertLastMigration(): Promise<void> {
+        try {
+            if (!this.dataSource.isInitialized) {
+                await this.dataSource.initialize();
             }
-        }
-    }
+            
+            const migrationExecutor = new MigrationExecutor(this.dataSource);
+            const executedMigrations = await migrationExecutor.getExecutedMigrations();
+            
+            console.log('Executed migrations:', executedMigrations);
 
-    private async ensureMigrationsTable(queryRunner: any): Promise<void> {
-        const migrationsTableExists = await queryRunner.hasTable('migrations');
-        if (!migrationsTableExists) {
-            console.log('Migrations table does not exist. Creating...');
-            await queryRunner.createTable(
-                new Table({
-                    name: 'migrations',
-                    columns: [
-                        {
-                            name: 'id',
-                            type: 'int',
-                            isPrimary: true,
-                            isGenerated: true,
-                            generationStrategy: 'increment',
-                        },
-                        {
-                            name: 'timestamp',
-                            type: 'bigint',
-                            isNullable: false,
-                        },
-                        {
-                            name: 'name',
-                            type: 'varchar',
-                            isNullable: false,
-                        },
-                    ],
-                })
-            );
-        }
-    }
+            const migrationsDir = path.join(__dirname, '..', 'database', 'migrations');
+            console.log('Migrations directory:', migrationsDir);
 
-    private async runPendingMigrations(queryRunner: any): Promise<void> {
-        const migrationsDir = path.join(__dirname, '../database/migrations');
-        const migrationFiles = fs.readdirSync(migrationsDir)
-            .filter(file => file.endsWith('.ts') && !file.endsWith('.d.ts'))
-            .sort();
+            const migrationFiles = fs.readdirSync(migrationsDir);
+            console.log('Migration files found:', migrationFiles);
 
-        for (const migrationFile of migrationFiles) {
-            const migrationName = path.parse(migrationFile).name;
-            const [timestamp] = migrationName.split('-');
-
-            const migrationExists = await this.checkMigrationExists(migrationName);
-
-            if (!migrationExists) {
-                console.log(`Running migration: ${migrationName}`);
-                const migration = await this.importMigration(path.join(migrationsDir, migrationFile));
-                await migration.up(queryRunner);
-
-                await this.recordMigration(parseInt(timestamp), migrationName);
-
-                console.log(`Migration ${migrationName} completed.`);
+            if (executedMigrations.length > 0) {
+                console.log('Reverting last migration...');
+                await migrationExecutor.undoLastMigration();
+                console.log('Last migration has been reverted.');
             } else {
-                console.log(`Migration ${migrationName} already run.`);
+                console.log('No migrations to revert.');
             }
+        } catch (error) {
+            console.error('Error reverting migration:', error);
+            throw error;
         }
-    }
-
-    private async checkMigrationExists(name: string): Promise<boolean> {
-        const result = await this.dataSource.manager
-            .createQueryBuilder()
-            .select()
-            .from('migrations', 'm')
-            .where('m.name = :name', { name })
-            .getRawOne();
-        return !!result;
-    }
-
-    private async importMigration(filePath: string): Promise<MigrationInterface> {
-        const migration = await import(filePath);
-        const MigrationClass = Object.values(migration)[0] as new () => MigrationInterface;
-        return new MigrationClass();
-    }
-
-    private async recordMigration(timestamp: number, name: string): Promise<void> {
-        await this.dataSource.manager
-            .createQueryBuilder()
-            .insert()
-            .into('migrations')
-            .values({ timestamp, name })
-            .execute();
     }
 }

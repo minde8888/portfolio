@@ -17,7 +17,7 @@ export class TypeORMAuthRepository implements IAuthRepository {
     }
 
     async create(auth: Omit<Auth, 'id'>): Promise<Auth> {
-        const entity = AuthEntity.fromDomain(new Auth(0, auth.email, auth.name, auth.password, auth.role, auth.refreshToken));
+        const entity = AuthEntity.fromDomain(new Auth(0, auth.email, auth.name, auth.password, auth.role));
         const savedEntity = await this.repository.save(entity);
         return savedEntity.toDomain();
     }

@@ -6,10 +6,13 @@
     "start": "ts-node ./src/server.ts",
     "dev": "nodemon ./src/server.ts",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/infrastructure/database/config/AppDataSource.ts",
+    "migration:generate": "ts-node src/infrastructure/database/scripts/generateMigration.ts",
     "migration:run": "ts-node src/infrastructure/cli/cli.ts run-migrations",
-    "migration:revert": "npm run typeorm -- migration:revert -d ./src/infrastructure/database/config/AppDataSource.ts",
-    "migration:run:force": "ts-node ./src/infrastructure/cli/cli.ts run-migrations-force"
+    "migration:revert": "ts-node src/infrastructure/cli/cli.ts revert-migration",
+    "migration:run:force": "ts-node ./src/infrastructure/cli/cli.ts run-migrations-force",
+    "migration:fix": "ts-node src/infrastructure/cli/cli.ts fix-migrations",
+    "migration:sync": "ts-node src/infrastructure/database/scripts/syncMigrations.ts",
+    "migration:list": "ts-node src/infrastructure/database/scripts/listMigrations.ts"
   },
   "dependencies": {
     "@automapper/classes": "^8.8.1",

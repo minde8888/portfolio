@@ -14,7 +14,9 @@ export class RegisterUseCase {
         const user = await this.authRepository.create({
             email, password: hashedPassword, role,
             name: name,
-            refreshToken: null
+            refreshToken: null,
+            createdAt: new Date(),
+            updatedAt: new Date()
         });
         return user.id;
     }

@@ -1,23 +1,33 @@
+import { MigrationExecutor } from "typeorm/migration/MigrationExecutor";
 import { AppDataSource } from "../../database/config/AppDataSource";
-import { CreateUserAndAuthTables1729327181519 } from "../../database/migrations/1729327181519-CreateUserAndAuthTables";
 
 export class RunMigrationsForceCommand {
     static async execute(): Promise<void> {
         try {
             await AppDataSource.initialize();
             const queryRunner = AppDataSource.createQueryRunner();
-            
-            console.log('Forcing migration to run...');
-            const migration = new CreateUserAndAuthTables1729327181519();
-            await migration.up(queryRunner);
-            
-            console.log('Migration forced. Checking tables...');
-            const tables = await queryRunner.getTables(['users', 'auth']);
-            console.log('Tables after forced migration:', tables.map(t => t.name));
-            
+
+            console.log('Initializing migration executor...');
+            const migrationExecutor = new MigrationExecutor(AppDataSource, queryRunner);
+
+            console.log('Checking for pending migrations...');
+            const pendingMigrations = await migrationExecutor.getPendingMigrations();
+
+            if (pendingMigrations.length > 0) {
+                console.log(`Found ${pendingMigrations.length} pending migration(s). Running...`);
+                await migrationExecutor.executePendingMigrations();
+                console.log('All pending migrations have been executed.');
+            } else {
+                console.log('No pending migrations found.');
+            }
+
+            console.log('Checking tables...');
+            const tables = await queryRunner.getTables();
+            console.log('Current tables:', tables.map(t => t.name));
+
             await queryRunner.release();
         } catch (error) {
-            console.error("Failed to force run migration:", error);
+            console.error("Failed to run migrations:", error);
         } finally {
             if (AppDataSource.isInitialized) {
                 await AppDataSource.destroy();
