@@ -3,9 +3,11 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
 import { UserEntity } from "../entities/UserEntity";
 import { UserNotFoundError, UserUpdateError } from "../../utils/Errors";
+import { HttpStatus } from '@nestjs/common';
+
 
 export class TypeORMUserRepository implements IUserRepository {
-  constructor(private readonly repository: Repository<UserEntity>) {}
+  constructor(private readonly repository: Repository<UserEntity>) { }
   getAll(): Promise<User[] | undefined> {
     throw new Error("Method not implemented.");
   }
@@ -22,10 +24,21 @@ export class TypeORMUserRepository implements IUserRepository {
     return userEntity ? userEntity.toDomain() : null;
   }
 
-  async create(user: Omit<User, "id" | "createdAt" | "updatedAt">): Promise<User> {
-    const userEntity = UserEntity.fromDomain(new User(0, user.email, user.name, user.role));
-    const savedEntity = await this.repository.save(userEntity);
-    return savedEntity.toDomain();
+  async create(user: User): Promise<{ status: number; error?: string }> {
+    try {
+      const existingUser = await this.repository.findOne({ where: { email: user.email } });
+      if (existingUser) {
+        return { status: 409, error: 'User with this email already exists' };
+      }
+
+      const userEntity = UserEntity.fromDomain(user);
+      const savedEntity = await this.repository.save(userEntity);
+      const savedUser = savedEntity.toDomain();
+      return { status: 201 };
+    } catch (error) {
+      console.error('Error creating user:', error);
+      return { status: 500, error: 'Failed to create user' };
+    }
   }
 
   async update(id: number, userData: Partial<User>): Promise<User> {

@@ -4,7 +4,7 @@ import { IDecodedToken } from '../../infrastructure/interfaces/IDecodedToken'; /
 import { IContainerResult } from '../../infrastructure/interfaces/IContainerResult';
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-  // const { authController } = container();
+
   const { authController }: IContainerResult = await container();
   const token = extractTokenFromHeader(req);
 

@@ -1,3 +1,6 @@
+import { createMapper } from '@automapper/core';
+import { classes } from '@automapper/classes';
+import { configureUserMapper } from '../../utils/mappers/userMapper';
 import { ConfigurableCache } from '../cache/ConfigurableCache';
 import { CreateUserUseCase } from "../../application/useCases/CreateUserUseCase";
 import { GetAllUsersUseCase } from "../../application/useCases/GetAllUsersUseCase";
@@ -19,8 +22,8 @@ import { IAuthService } from '../../domain/services/IAuthService';
 import { RefreshTokenUseCase } from '../../application/useCases/auth/RefreshTokenUseCase';
 import { IContainerResult } from '../interfaces/IContainerResult';
 
-export async  function container(): Promise<IContainerResult> {
 
+export async function container(): Promise<IContainerResult> {
   const database = new Database();
   await database.connect();
 
@@ -38,6 +41,12 @@ export async  function container(): Promise<IContainerResult> {
   const cacheService: ICacheService = new ConfigurableCache();
   const authService: IAuthService = new JwtAuthService(authRepository);
 
+  // Configure AutoMapper
+  const mapper = createMapper({
+    strategyInitializer: classes(),
+  });
+  configureUserMapper(mapper);
+
   // User Use Cases
   const createUserUseCase = new CreateUserUseCase(userRepository);
   const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
@@ -47,7 +56,7 @@ export async  function container(): Promise<IContainerResult> {
 
   // Auth Use Cases
   const loginUseCase = new LoginUseCase(authRepository, authService);
-  const registerUseCase = new RegisterUseCase(authRepository);
+  const registerUseCase = new RegisterUseCase(authRepository, userRepository, mapper);
   const refreshTokenUseCase = new RefreshTokenUseCase(authRepository, authService);
 
   // Controllers
@@ -65,5 +74,5 @@ export async  function container(): Promise<IContainerResult> {
     refreshTokenUseCase
   );
 
-  return { userController, authController };
+  return { userController, authController, mapper };
 }

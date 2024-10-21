@@ -5,7 +5,7 @@ import { loginSchema, registerSchema } from "../middlewares/validateRequest";
 import { IContainerResult } from "../../infrastructure/interfaces/IContainerResult";
 
 export default async (router: Router): Promise<void> => {
-  // const { authController } = container();
+
   const { authController }: IContainerResult = await container();
   const validateBody = (schema: any) => expressYupMiddleware({
     schemaValidator: {
@@ -14,16 +14,16 @@ export default async (router: Router): Promise<void> => {
   });
 
   router.post(
-    "/v1/auth/login",
+    "/v1/login",
     validateBody(loginSchema),
     authController.login
   );
 
   router.post(
-    "/v1/auth/register",
+    "/v1/register",
     validateBody(registerSchema),
     authController.register
   );
 
-  router.post("/v1/auth/refresh-token", authController.refreshToken);
+  router.post("/v1/refresh-token", authController.refreshToken);
 };

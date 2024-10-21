@@ -45,3 +45,4 @@ export class AuthError extends Error {
     this.name = 'AuthError';
   }
 }
+
