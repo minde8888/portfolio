@@ -1,12 +1,10 @@
-import 'reflect-metadata';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, Column, OneToOne } from 'typeorm';
+import { BaseEntity } from './BaseEntity';
 import { User } from '../../domain/entities/User';
+import { AuthEntity } from './AuthEntity';
 
 @Entity('users')
-export class UserEntity {
-    @PrimaryGeneratedColumn()
-    id!: number;
-
+export class UserEntity extends BaseEntity {
     @Column({ unique: true })
     email!: string;
 
@@ -19,13 +17,18 @@ export class UserEntity {
     @Column('text', { nullable: true })
     refreshToken!: string | null;
 
+    @OneToOne(() => AuthEntity, auth => auth.user)
+    auth!: AuthEntity;
+
     toDomain(): User {
         return new User(
             this.id,
             this.email,
             this.name,
             this.role,
-            this.refreshToken
+            this.refreshToken,
+            this.createdAt,
+            this.updatedAt
         );
     }
 
@@ -36,7 +39,8 @@ export class UserEntity {
         entity.name = user.name;
         entity.role = user.role;
         entity.refreshToken = user.refreshToken;
-
+        entity.createdAt = user.createdAt;
+        entity.updatedAt = user.updatedAt;
         return entity;
     }
 }

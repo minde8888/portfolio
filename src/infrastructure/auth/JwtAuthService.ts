@@ -3,7 +3,7 @@ import * as bcrypt from "bcrypt";
 import { IAuthService } from './../../domain/services/IAuthService';
 import { IAuthRepository } from "../../domain/repositories/IAuthRepository";
 import { Auth } from "../../domain/entities/Auth";
-import { AuthError } from "../../utils/Errors";
+import { AuthError } from "../../utils/Errors/Errors";
 import { IDecodedToken } from "../interfaces/IDecodedToken";
 
 export class JwtAuthService implements IAuthService {

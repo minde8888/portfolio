@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import express from "express";
 import { Database } from "./infrastructure/database/Database";
-import { errorHandler } from "./presentation/middlewares/errorHandler";
+import { errorMiddleware } from "./presentation/middlewares/errorMiddleware";
 import userRoutes from "./presentation/routes/userRoutes";
 import authRoutes from "./presentation/routes/authRoutes";
 
@@ -18,7 +18,7 @@ async function bootstrap() {
 
   app.use("/api/", router);
 
-  app.use(errorHandler);
+  app.use(errorMiddleware);
 
   try {
     await database.connect();

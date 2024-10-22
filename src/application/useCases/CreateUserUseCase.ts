@@ -1,4 +1,4 @@
-import { EmailAlreadyExistsError, ValidationError } from "../../utils/Errors";
+import { EmailAlreadyExistsError, ValidationError } from "../../utils/Errors/Errors";
 import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 

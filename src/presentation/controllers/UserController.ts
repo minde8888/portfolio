@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { CreateUserUseCase } from "../../application/useCases/CreateUserUseCase";
 import { GetAllUsersUseCase } from "../../application/useCases/GetAllUsersUseCase";
 import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
-import { ValidationError } from "../../utils/Errors";
+import { ValidationError } from "../../utils/Errors/Errors";
 import { UpdateUserUseCase } from "../../application/useCases/UpdateUserUseCase";
 import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase";
 
@@ -49,9 +49,8 @@ export class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const id = parseInt(req.params.id, 10);
 
-      const user = await this.getUserByIdUseCase.execute(id);
+      const user = await this.getUserByIdUseCase.execute(req.params.id);
       res.status(200).json(user);
     } catch (error) {
       next(error);
@@ -64,10 +63,10 @@ export class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const id = parseInt(req.params.id, 10);
+
       const { email, name } = req.body;
 
-      const updatedUser = await this.updateUserUseCase.execute(id, {
+      const updatedUser = await this.updateUserUseCase.execute(req.params.id, {
         email,
         name,
       });
@@ -83,8 +82,8 @@ export class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const id = parseInt(req.params.id);
-      const user = await this.removeUserUseCase.execute(id);
+
+      const user = await this.removeUserUseCase.execute(req.params.id);
       res.status(200).json(user);
     } catch (error) {
       next(error);

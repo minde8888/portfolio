@@ -1,7 +1,8 @@
-import { UserNotFoundError, ValidationError } from "../../utils/Errors";
+import { UserNotFoundError, ValidationError } from "../../utils/Errors/Errors";
 import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { ICacheService } from "../../domain/services/ICacheService";
+import { validate as uuidValidate } from 'uuid';
 
 export class GetUserByIdUseCase {
   constructor(
@@ -9,8 +10,8 @@ export class GetUserByIdUseCase {
     private cacheService: ICacheService
   ) {}
 
-  async execute(id: number): Promise<User> {
-    if (isNaN(id)) {
+  async execute(id: string): Promise<User> {
+    if (uuidValidate(id)) {
       throw new ValidationError("Invalid user ID");
     }
     const cacheKey = `user:${id}`;

@@ -1,15 +1,22 @@
-import { UserNotFoundError, UserUpdateError } from "../../utils/Errors";
+import { UserNotFoundError, UserUpdateError, ValidationError } from "../../utils/Errors/Errors";
 import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { validate as uuidValidate } from 'uuid';
 
 export class UpdateUserUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private userRepository: IUserRepository) { }
 
   async execute(
-    id: number,
+    id: string,
     updates: { email?: string; name?: string }
   ): Promise<User> {
+
+    if (uuidValidate(id)) {
+      throw new ValidationError("Invalid user ID");
+    }
+
     const existingUser = await this.userRepository.findById(id);
+    
     if (!existingUser) {
       throw new UserNotFoundError(`User with id ${id} not found`);
     }

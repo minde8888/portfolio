@@ -1,12 +1,10 @@
-import 'reflect-metadata';
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
+import { BaseEntity } from './BaseEntity';
 import { Auth } from '../../domain/entities/Auth';
+import { UserEntity } from './UserEntity';
 
 @Entity('auth')
-export class AuthEntity {
-    @PrimaryGeneratedColumn()
-    id!: number;
-
+export class AuthEntity extends BaseEntity {
     @Column({ unique: true })
     email!: string;
 
@@ -22,11 +20,12 @@ export class AuthEntity {
     @Column('text', { nullable: true })
     refreshToken!: string | null;
 
-    @CreateDateColumn()
-    createdAt!: Date;
-
-    @UpdateDateColumn()
-    updatedAt!: Date;
+    @OneToOne(() => UserEntity, {
+        cascade: true,
+        eager: true
+    })
+    @JoinColumn()
+    user!: UserEntity;
 
     toDomain(): Auth {
         return new Auth(
@@ -37,7 +36,8 @@ export class AuthEntity {
             this.role,
             this.refreshToken,
             this.createdAt,
-            this.updatedAt
+            this.updatedAt,
+            this.user?.toDomain()
         );
     }
 
@@ -51,6 +51,10 @@ export class AuthEntity {
         entity.refreshToken = auth.refreshToken;
         entity.createdAt = auth.createdAt;
         entity.updatedAt = auth.updatedAt;
+
+        if (auth.user) {
+            entity.user = UserEntity.fromDomain(auth.user);
+        }
 
         return entity;
     }

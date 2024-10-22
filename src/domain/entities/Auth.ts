@@ -1,47 +1,43 @@
 import { AutoMap } from '@automapper/classes';
+import { BaseModel } from './BaseModel';
+import { User } from './User';
 
-export class Auth {
-  @AutoMap()
-  id: number;
+export class Auth extends BaseModel {
+    @AutoMap()
+    email: string;
 
-  @AutoMap()
-  email: string;
+    @AutoMap()
+    name: string;
 
-  @AutoMap()
-  name: string;
+    @AutoMap()
+    password: string;
 
-  @AutoMap()
-  password: string;
+    @AutoMap()
+    role: string;
 
-  @AutoMap()
-  role: string;
+    @AutoMap()
+    refreshToken: string | null;
 
-  @AutoMap()
-  createdAt: Date;
+    @AutoMap(() => User)
+    user?: User;
 
-  @AutoMap()
-  updatedAt: Date;
-
-  @AutoMap()
-  refreshToken: string | null;
-
-  constructor(
-    id: number,
-    email: string,
-    name: string,
-    password: string,
-    role: string,
-    refreshToken: string | null = null,
-    createdAt: Date = new Date(),
-    updatedAt: Date = new Date()
-  ) {
-    this.id = id;
-    this.email = email;
-    this.name = name;
-    this.password = password;
-    this.role = role;
-    this.refreshToken = refreshToken;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
-  }
+    constructor(
+        id: string,
+        email: string,
+        name: string,
+        password: string,
+        role: string,
+        refreshToken: string | null = null,
+        createdAt: Date = new Date(),
+        updatedAt: Date = new Date(),
+        user?: User
+    ) {
+        super(id, createdAt, updatedAt);
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.role = role;
+        this.refreshToken = refreshToken;
+        this.user = user;
+    }
 }

@@ -4,7 +4,7 @@ interface AppError extends Error {
   statusCode?: number;
 }
 
-export function errorHandler(
+export function errorMiddleware(
   err: AppError,
   req: Request,
   res: Response,

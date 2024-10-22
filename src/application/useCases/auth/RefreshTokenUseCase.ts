@@ -12,7 +12,7 @@ export class RefreshTokenUseCase {
     try {
       const decoded = this.authService.verifyRefreshToken(refreshToken);
   
-      const user = decoded.userId ? await this.authRepository.findById(parseInt(decoded.userId)) : null;
+      const user = decoded.userId ? await this.authRepository.findById(decoded.userId) : null;
 
       if (!user || user.refreshToken !== refreshToken) {
         return null;
