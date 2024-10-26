@@ -23,15 +23,14 @@ export class TypeORMUserRepository implements IUserRepository {
     }
   }
   
-
-  getAll(): Promise<User[] | undefined> {
-    throw new Error("Method not implemented.");
-  }
-
   async findById(id: string): Promise<User | null> {
     const userEntity = await this.repository.findOne({ where: { id } });
     if (!userEntity) throw new UserNotFoundError(`User with id ${id} not found`);
     return userEntity.toDomain();
+  }
+
+  getAll(): Promise<User[] | undefined> {
+    throw new Error("Method not implemented.");
   }
 
   async findByEmail(email: string): Promise<User | null> {

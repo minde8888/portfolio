@@ -1,10 +1,12 @@
 import { IDecodedToken } from "../../../infrastructure/interfaces/IDecodedToken";
 import { IAuthRepository } from "../../../domain/repositories/IAuthRepository";
 import { IAuthService } from "../../../domain/services/IAuthService";
+import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 
 export class RefreshTokenUseCase {
   constructor(
     private authRepository: IAuthRepository,
+    private userRepository: IUserRepository,
     private authService: IAuthService
   ) { }
 
@@ -12,7 +14,7 @@ export class RefreshTokenUseCase {
     try {
       const decoded = this.authService.verifyRefreshToken(refreshToken);
   
-      const user = decoded.userId ? await this.authRepository.findById(decoded.userId) : null;
+      const user = decoded.userId ? await this.userRepository.findById(decoded.userId) : null;
 
       if (!user || user.refreshToken !== refreshToken) {
         return null;

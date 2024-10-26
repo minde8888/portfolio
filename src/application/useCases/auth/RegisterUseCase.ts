@@ -17,7 +17,6 @@ export class RegisterUseCase {
     async execute(email: string, name: string, password: string, role: string): Promise<{ status: number; error?: string }> {
 
         try {
-            // Input validation
             if (!email || !name || !password || !role) {
                 return {
                     status: HttpStatus.BAD_REQUEST,
@@ -25,7 +24,6 @@ export class RegisterUseCase {
                 };
             }
 
-            // Check for existing user
             const existingUser = await this.authRepository.findByEmail(email);
             if (existingUser) {
                 return {
@@ -34,10 +32,8 @@ export class RegisterUseCase {
                 };
             }
 
-            // Hash password
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            // Create auth record
             const authCreationResult = await this.authRepository.create({
                 email,
                 password: hashedPassword,
@@ -47,7 +43,6 @@ export class RegisterUseCase {
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
-
 
             const { user: auth } = authCreationResult;
             const user = this.mapper.map(auth, Auth, User);

@@ -6,24 +6,53 @@ import { createDatabaseIfNotExists } from "./utils/createDatabase";
 import { AppDataSource } from "./config/AppDataSource";
 
 export class Database implements IDatabase {
+  private static instance: Database;
   private dataSource: DataSource;
+  private isConnected: boolean = false;
 
-  constructor() {
+  private constructor() {
     this.dataSource = AppDataSource;
   }
 
+  public static getInstance(): Database {
+    if (!Database.instance) {
+      Database.instance = new Database();
+    }
+    return Database.instance;
+  }
+
   async connect(): Promise<void> {
-    await createDatabaseIfNotExists();
-    await this.dataSource.initialize();
-    console.log("Database connected and initialized");
+    if (this.isConnected) {
+      console.log("Database already connected");
+      return;
+    }
+
+    try {
+      await createDatabaseIfNotExists();
+      
+      if (!this.dataSource.isInitialized) {
+        await this.dataSource.initialize();
+        this.isConnected = true;
+        console.log("Database connected and initialized");
+      }
+    } catch (error) {
+      console.error("Error connecting to database:", error);
+      throw error;
+    }
   }
 
   async disconnect(): Promise<void> {
-    await this.dataSource.destroy();
-    console.log("Database disconnected");
+    if (this.isConnected && this.dataSource.isInitialized) {
+      await this.dataSource.destroy();
+      this.isConnected = false;
+      console.log("Database disconnected");
+    }
   }
 
   getDataSource(): DataSource {
+    if (!this.isConnected || !this.dataSource.isInitialized) {
+      throw new Error("Database not connected. Call connect() first.");
+    }
     return this.dataSource;
   }
 }

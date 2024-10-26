@@ -1,6 +1,6 @@
-import { UserNotFoundError, UserUpdateError, ValidationError } from "../../utils/Errors/Errors";
-import { User } from "../../domain/entities/User";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { UserNotFoundError, UserUpdateError, ValidationError } from "../../../utils/Errors/Errors";
+import { User } from "../../../domain/entities/User";
+import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { validate as uuidValidate } from 'uuid';
 
 export class UpdateUserUseCase {

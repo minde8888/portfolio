@@ -7,22 +7,31 @@ import authRoutes from "./presentation/routes/authRoutes";
 
 async function bootstrap() {
   const app = express();
-  const database = new Database();
+  const database = Database.getInstance();
 
   app.use(express.json());
 
   const router = express.Router();
-
-  userRoutes(router);
-  authRoutes(router);
+  
+  // Setup routes
+  await userRoutes(router);
+  await authRoutes(router);
 
   app.use("/api/", router);
-
   app.use(errorMiddleware);
+
+  // Graceful shutdown handling
+  const shutdown = async () => {
+    console.log('Shutting down gracefully...');
+    await database.disconnect();
+    process.exit(0);
+  };
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
 
   try {
     await database.connect();
-
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
@@ -34,7 +43,21 @@ async function bootstrap() {
   }
 }
 
-bootstrap().catch((error) => {
-  console.error("Unhandled error during bootstrap:", error);
+// Handle uncaught errors
+process.on('uncaughtException', async (error) => {
+  console.error("Uncaught exception:", error);
+  await Database.getInstance().disconnect();
+  process.exit(1);
+});
+
+process.on('unhandledRejection', async (error) => {
+  console.error("Unhandled rejection:", error);
+  await Database.getInstance().disconnect();
+  process.exit(1);
+});
+
+bootstrap().catch(async (error) => {
+  console.error("Bootstrap error:", error);
+  await Database.getInstance().disconnect();
   process.exit(1);
 });

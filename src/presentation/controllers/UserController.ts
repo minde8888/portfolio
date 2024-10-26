@@ -1,34 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import { CreateUserUseCase } from "../../application/useCases/CreateUserUseCase";
-import { GetAllUsersUseCase } from "../../application/useCases/GetAllUsersUseCase";
-import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
-import { ValidationError } from "../../utils/Errors/Errors";
-import { UpdateUserUseCase } from "../../application/useCases/UpdateUserUseCase";
-import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase";
+import { GetAllUsersUseCase } from "../../application/useCases/user/GetAllUsersUseCase";
+import { GetUserByIdUseCase } from "../../application/useCases/user/GetUserByIdUseCase";
+import { UpdateUserUseCase } from "../../application/useCases/user/UpdateUserUseCase";
+import { RemoveUserUseCase } from "../../application/useCases/user/RemoveUserUseCase";
 
 export class UserController {
   constructor(
-    private readonly createUserUseCase: CreateUserUseCase,
     private readonly getAllUsersUseCase: GetAllUsersUseCase,
     private readonly getUserByIdUseCase: GetUserByIdUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly removeUserUseCase: RemoveUserUseCase
   ) {}
-
-  // createUser = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> => {
-  //   try {
-  //     const { email, name } = req.body;
-
-  //     const user = await this.createUserUseCase.execute(email, name);
-  //     res.status(201).json(user);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
 
   getAllUsers = async (
     req: Request,

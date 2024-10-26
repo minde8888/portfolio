@@ -10,7 +10,6 @@ export class RedisCache implements ICacheService {
   private isConnected: boolean = false;
 
   constructor() {
-    console.log('Initializing Redis client...');
     console.log(`Redis URL: ${process.env.REDIS_URL || 'redis://localhost:6379'}`);
 
     this.client = createClient({

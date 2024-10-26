@@ -8,6 +8,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   const { authController }: IContainerResult = await container();
   const token = extractTokenFromHeader(req);
 
+
   if (!token) {
     return res.status(401).json({ message: 'No token provided' });
   }
@@ -15,16 +16,17 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   try {
     const decodedToken = await authController.verifyToken(token);
 
-    // Cast `req` as your augmented Request type to avoid TypeScript errors
     (req as Request & { user?: IDecodedToken }).user = decodedToken;
 
     next();
   } catch (error) {
+
+    console.log(error);
+
     return res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
 
-// Helper function to extract token from the Authorization header
 const extractTokenFromHeader = (req: Request): string | null => {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {

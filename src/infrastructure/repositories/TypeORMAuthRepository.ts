@@ -3,6 +3,8 @@ import { IAuthRepository } from '../../domain/repositories/IAuthRepository';
 import { Auth } from '../../domain/entities/Auth';
 import { HttpStatus } from '@nestjs/common';
 import { AuthEntity } from '../entities/AuthEntity';
+import {v4 as uuidv4} from 'uuid';
+import { User } from 'src/domain/entities/User';
 
 export class TypeORMAuthRepository implements IAuthRepository {
     constructor(private repository: Repository<AuthEntity>) { }
@@ -12,14 +14,11 @@ export class TypeORMAuthRepository implements IAuthRepository {
         return user ? user.toDomain() : null;
     }
 
-    async findById(id: string): Promise<Auth | null> {
-        const user = await this.repository.findOne({ where: { id } });
-        return user ? user.toDomain() : null;
-    }
+
 
     async create(auth: Omit<Auth, 'id'>): Promise<{ status: number; user: Auth; error?: string }> {
         try {
-            const entity = AuthEntity.fromDomain(new Auth("0", auth.email, auth.name, auth.password, auth.role));
+            const entity = AuthEntity.fromDomain(new Auth(uuidv4(), auth.email, auth.name, auth.password, auth.role));
             const user = await this.repository.save(entity);
             return { status: HttpStatus.CREATED, user };
         } catch (error) {

@@ -12,15 +12,14 @@ export function configureUserMapper(mapper: Mapper) {
         forMember(dest => dest.refreshToken, mapFrom(src => src.refreshToken))
     );
     
-    // CreateUserDTO to User mapping
-    //   createMap(
-    //     mapper,
-    //     CreateUserDTO,
-    //     User,
-    //     forMember(dest => dest.email, mapFrom(src => src.email)),
-    //     forMember(dest => dest.name, mapFrom(src => src.name)),
-    //     forMember(dest => dest.role, mapFrom(src => src.role))
-    //   );
+      createMap(
+        mapper,
+        UserDTO,
+        User,
+        forMember(dest => dest.email, mapFrom(src => src.email)),
+        forMember(dest => dest.name, mapFrom(src => src.name)),
+        forMember(dest => dest.role, mapFrom(src => src.role))
+      );
 
     // UpdateUserDTO to User mapping
     //   createMap(

@@ -2,15 +2,14 @@ import { createMapper } from '@automapper/core';
 import { classes } from '@automapper/classes';
 import { configureUserMapper } from '../../utils/mappers/userMapper';
 import { ConfigurableCache } from '../cache/ConfigurableCache';
-import { CreateUserUseCase } from "../../application/useCases/CreateUserUseCase";
-import { GetAllUsersUseCase } from "../../application/useCases/GetAllUsersUseCase";
+import { GetAllUsersUseCase } from "../../application/useCases/user/GetAllUsersUseCase";
 import { UserEntity } from "../entities/UserEntity";
 import { TypeORMUserRepository } from "../repositories/TypeORMUserRepository";
 import { UserController } from "../../presentation/controllers/UserController";
 import { Database } from "../database/Database";
-import { GetUserByIdUseCase } from "../../application/useCases/GetUserByIdUseCase";
-import { UpdateUserUseCase } from "../../application/useCases/UpdateUserUseCase";
-import { RemoveUserUseCase } from "../../application/useCases/RemoveUserUseCase";
+import { GetUserByIdUseCase } from "../../application/useCases/user/GetUserByIdUseCase";
+import { UpdateUserUseCase } from "../../application/useCases/user/UpdateUserUseCase";
+import { RemoveUserUseCase } from "../../application/useCases/user/RemoveUserUseCase";
 import { ICacheService } from "../../domain/services/ICacheService";
 import { JwtAuthService } from '../auth/JwtAuthService';
 import { LoginUseCase } from '../../application/useCases/auth/LoginUseCase';
@@ -24,7 +23,7 @@ import { IContainerResult } from '../interfaces/IContainerResult';
 
 
 export async function container(): Promise<IContainerResult> {
-  const database = new Database();
+  const database = Database.getInstance();
   await database.connect();
 
   const dataSource = database.getDataSource();
@@ -48,20 +47,18 @@ export async function container(): Promise<IContainerResult> {
   configureUserMapper(mapper);
 
   // User Use Cases
-  const createUserUseCase = new CreateUserUseCase(userRepository);
   const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
-  const getUserByIdUseCase = new GetUserByIdUseCase(userRepository, cacheService);
+  const getUserByIdUseCase = new GetUserByIdUseCase(userRepository, cacheService, mapper);
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const removeUserUseCase = new RemoveUserUseCase(userRepository);
 
   // Auth Use Cases
   const loginUseCase = new LoginUseCase(authRepository, authService);
   const registerUseCase = new RegisterUseCase(authRepository, userRepository, mapper);
-  const refreshTokenUseCase = new RefreshTokenUseCase(authRepository, authService);
+  const refreshTokenUseCase = new RefreshTokenUseCase(authRepository, userRepository, authService);
 
   // Controllers
   const userController = new UserController(
-    createUserUseCase,
     getAllUsersUseCase,
     getUserByIdUseCase,
     updateUserUseCase,

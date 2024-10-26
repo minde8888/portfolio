@@ -30,6 +30,7 @@ export default async (router: Router): Promise<void> => {
   router.put(
     "/v1/users/:id",
     authMiddleware,
+    roleMiddleware(['user','admin']),
     validateBody(userUpdateSchema),
     userController.updateUser
   );

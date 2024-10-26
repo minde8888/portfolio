@@ -2,7 +2,7 @@ import { AutoMap } from '@automapper/classes';
 
 export class UserDTO {
     @AutoMap()
-    id: number;
+    id: string;
 
     @AutoMap()
     email: string;
@@ -13,11 +13,12 @@ export class UserDTO {
     @AutoMap()
     role: string;
 
+
     constructor(
-        id: number,
+        id: string,
         email: string,
         name: string,
-        role: string
+        role: string,
     ) {
         this.id = id;
         this.email = email;

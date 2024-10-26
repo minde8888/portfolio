@@ -1,5 +1,5 @@
-import { ValidationError } from "../../utils/Errors/Errors";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { ValidationError } from "../../../utils/Errors/Errors";
+import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { validate as uuidValidate } from 'uuid';
 
 export class RemoveUserUseCase {
