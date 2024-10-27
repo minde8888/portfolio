@@ -1,4 +1,4 @@
- export class AppError extends Error {
+export class AppError extends Error {
   constructor(
     public message: string,
     public statusCode: number = 500,
@@ -48,7 +48,14 @@ export class AuthError extends Error {
 
 export class DatabaseError extends Error {
   constructor(message: string, public readonly originalError: Error) {
-      super(message);
-      this.name = 'DatabaseError';
+    super(message);
+    this.name = 'DatabaseError';
+  }
+}
+
+export class UpdateError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'UpdateError';
   }
 }

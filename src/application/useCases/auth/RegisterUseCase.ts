@@ -1,10 +1,12 @@
 import * as bcrypt from "bcrypt";
+import { Mapper } from '@automapper/core';
+import { HttpStatus } from "@nestjs/common";
+
 import { IAuthRepository } from '../../../domain/repositories/IAuthRepository';
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { Mapper } from '@automapper/core';
 import { Auth } from '../../../domain/entities/Auth';
 import { User } from "../../../domain/entities/User";
-import { HttpStatus } from "@nestjs/common";
+
 import { handleError } from "../../../utils/Errors/handleError";
 
 export class RegisterUseCase {
@@ -39,14 +41,14 @@ export class RegisterUseCase {
                 password: hashedPassword,
                 role,
                 name: name,
-                refreshToken: null,
                 createdAt: new Date(),
-                updatedAt: new Date()
+                updatedAt: null
             });
 
-            const { user: auth } = authCreationResult;
+            const { auth: auth } = authCreationResult;
             const user = this.mapper.map(auth, Auth, User);
             await this.userRepository.create(user);
+
             return {
                 status: HttpStatus.CREATED,
             };

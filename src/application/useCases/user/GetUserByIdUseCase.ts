@@ -1,5 +1,6 @@
 import { validate as uuidValidate } from 'uuid';
 import { Mapper } from '@automapper/core';
+
 import { UserNotFoundError, ValidationError } from "../../../utils/Errors/Errors";
 import { User } from "../../../domain/entities/User";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
@@ -18,6 +19,7 @@ export class GetUserByIdUseCase {
     if (!uuidValidate(id)) {
       throw new ValidationError("Invalid user ID");
     }
+    
     const cacheKey = `user:${id}`;
     const cachedUser = await this.cacheService.get(cacheKey);
 

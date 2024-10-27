@@ -1,9 +1,7 @@
 import { AutoMap } from '@automapper/classes';
+import { BaseModel } from './BaseModel';
 
-export class User {
-    @AutoMap()
-    id: string;
-
+export class User extends BaseModel {
     @AutoMap()
     email: string;
 
@@ -17,10 +15,7 @@ export class User {
     refreshToken: string | null;
 
     @AutoMap()
-    createdAt: Date;
-
-    @AutoMap()
-    updatedAt: Date;
+    isDeleted: boolean;
 
     constructor(
         id: string,
@@ -28,15 +23,15 @@ export class User {
         name: string,
         role: string,
         refreshToken: string | null,
-        createdAt: Date,
-        updatedAt: Date
+        createdAt:Date | null = null,
+        updatedAt: Date | null = null,
+        isDeleted: boolean
     ) {
-        this.id = id;
+        super(id, createdAt, updatedAt);
         this.email = email;
         this.name = name;
         this.role = role;
         this.refreshToken = refreshToken;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.isDeleted = isDeleted;
     }
 }

@@ -5,8 +5,8 @@ export abstract class BaseEntity {
     id!: string;
 
     @CreateDateColumn()
-    createdAt!: Date;
+    createdAt!: Date | null;
 
     @UpdateDateColumn()
-    updatedAt!: Date;
+    updatedAt!: Date | null;
 }

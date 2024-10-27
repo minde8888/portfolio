@@ -5,15 +5,15 @@ export abstract class BaseModel {
     id!: string;
 
     @AutoMap()
-    createdAt: Date;
+    createdAt: Date | null;
 
     @AutoMap()
-    updatedAt: Date;
+    updatedAt: Date | null;
 
     constructor(
         id: string,
-        createdAt: Date = new Date(),
-        updatedAt: Date = new Date()
+        createdAt: Date | null = null,
+        updatedAt: Date | null = null
     ) {
         this.id = id;
         this.createdAt = createdAt;

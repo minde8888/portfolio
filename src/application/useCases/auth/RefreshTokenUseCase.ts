@@ -1,11 +1,9 @@
 import { IDecodedToken } from "../../../infrastructure/interfaces/IDecodedToken";
-import { IAuthRepository } from "../../../domain/repositories/IAuthRepository";
 import { IAuthService } from "../../../domain/services/IAuthService";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 
 export class RefreshTokenUseCase {
   constructor(
-    private authRepository: IAuthRepository,
     private userRepository: IUserRepository,
     private authService: IAuthService
   ) { }
@@ -23,7 +21,7 @@ export class RefreshTokenUseCase {
       const accessToken = this.authService.generateAccessToken(user);
       const newRefreshToken = this.authService.generateRefreshToken(user);
 
-      await this.authRepository.update(user.id, { refreshToken: newRefreshToken });
+      await this.userRepository.update(user.id, { refreshToken: newRefreshToken });
 
       return { accessToken, refreshToken: newRefreshToken };
     } catch (error) {

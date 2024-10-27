@@ -53,9 +53,9 @@ export async function container(): Promise<IContainerResult> {
   const removeUserUseCase = new RemoveUserUseCase(userRepository);
 
   // Auth Use Cases
-  const loginUseCase = new LoginUseCase(authRepository, authService);
+  const loginUseCase = new LoginUseCase(userRepository, authService, mapper);
   const registerUseCase = new RegisterUseCase(authRepository, userRepository, mapper);
-  const refreshTokenUseCase = new RefreshTokenUseCase(authRepository, userRepository, authService);
+  const refreshTokenUseCase = new RefreshTokenUseCase(userRepository, authService);
 
   // Controllers
   const userController = new UserController(

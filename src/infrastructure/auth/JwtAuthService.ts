@@ -1,19 +1,26 @@
 import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
-import { IAuthService } from './../../domain/services/IAuthService';
-import { IAuthRepository } from "../../domain/repositories/IAuthRepository";
-import { Auth } from "../../domain/entities/Auth";
+
 import { AuthError } from "../../utils/Errors/Errors";
+
 import { IDecodedToken } from "../interfaces/IDecodedToken";
 
+import { IAuthService } from './../../domain/services/IAuthService';
+import { IAuthRepository } from "../../domain/repositories/IAuthRepository";
+import { User } from "../../domain/entities/User";
+import { Auth } from "../../domain/entities/Auth";
+
 export class JwtAuthService implements IAuthService {
+
   constructor(private authRepository: IAuthRepository) {
+
     if (!process.env.JWT_ACCESS_SECRET || !process.env.JWT_REFRESH_SECRET) {
       throw new Error('JWT secrets must be defined in environment variables');
     }
   }
 
   async validateUser(email: string, password: string): Promise<Auth | null> {
+    
     const user = await this.authRepository.findByEmail(email);
     if (user && await bcrypt.compare(password, user.password)) {
       return user;
@@ -21,7 +28,7 @@ export class JwtAuthService implements IAuthService {
     return null;
   }
 
-  generateAccessToken(user: Auth): string {
+  generateAccessToken(user: User): string {
     return jwt.sign(
       {
         userId: user.id,
@@ -33,7 +40,7 @@ export class JwtAuthService implements IAuthService {
     );
   }
 
-  generateRefreshToken(user: Auth): string {
+  generateRefreshToken(user: User): string {
     return jwt.sign(
       { userId: user.id },
       process.env.JWT_REFRESH_SECRET!,

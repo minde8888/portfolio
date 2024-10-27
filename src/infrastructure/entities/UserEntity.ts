@@ -5,20 +5,32 @@ import { AuthEntity } from './AuthEntity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {
-    @Column({ unique: true })
-    email!: string;
+    @Column({ unique: true, type: 'varchar' })
+    email: string;
 
-    @Column()
-    name!: string;
+    @Column({ type: 'varchar' })
+    name: string;
 
-    @Column()
-    role!: string;
+    @Column({ type: 'varchar', default: 'user' })
+    role: string;
 
-    @Column('text', { nullable: true })
-    refreshToken!: string | null;
+    @Column({ type: 'text', nullable: true, default: null })
+    refreshToken: string | null;
+
+    @Column({ name: 'is_deleted', type: 'boolean', default: false })
+    isDeleted: boolean;
 
     @OneToOne(() => AuthEntity, auth => auth.user)
     auth!: AuthEntity;
+
+    constructor(email: string = '', name: string = '', role: string = 'user', refreshToken: string | null = null) {
+        super();
+        this.email = email;
+        this.name = name;
+        this.role = role;
+        this.refreshToken = refreshToken;
+        this.isDeleted = false;
+    }
 
     toDomain(): User {
         return new User(
@@ -28,7 +40,8 @@ export class UserEntity extends BaseEntity {
             this.role,
             this.refreshToken,
             this.createdAt,
-            this.updatedAt
+            this.updatedAt,
+            this.isDeleted
         );
     }
 
@@ -43,4 +56,4 @@ export class UserEntity extends BaseEntity {
         entity.updatedAt = user.updatedAt;
         return entity;
     }
-}
+} 

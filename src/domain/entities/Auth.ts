@@ -15,9 +15,6 @@ export class Auth extends BaseModel {
     @AutoMap()
     role: string;
 
-    @AutoMap()
-    refreshToken: string | null;
-
     @AutoMap(() => User)
     user?: User;
 
@@ -27,9 +24,8 @@ export class Auth extends BaseModel {
         name: string,
         password: string,
         role: string,
-        refreshToken: string | null = null,
-        createdAt: Date = new Date(),
-        updatedAt: Date = new Date(),
+        createdAt:Date | null = null,
+        updatedAt: Date | null = null,
         user?: User
     ) {
         super(id, createdAt, updatedAt);
@@ -37,7 +33,6 @@ export class Auth extends BaseModel {
         this.name = name;
         this.password = password;
         this.role = role;
-        this.refreshToken = refreshToken;
         this.user = user;
     }
 }

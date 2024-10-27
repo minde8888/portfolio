@@ -5,57 +5,73 @@ import { UserEntity } from './UserEntity';
 
 @Entity('auth')
 export class AuthEntity extends BaseEntity {
-    @Column({ unique: true })
+    @Column({
+        unique: true,
+        type: 'varchar'
+    })
     email!: string;
 
-    @Column()
+    @Column({
+        type: 'varchar'
+    })
     name!: string;
 
-    @Column()
+    @Column({
+        type: 'varchar'
+    })
     password!: string;
 
-    @Column()
+    @Column({
+        type: 'varchar',
+        default: 'user'
+    })
     role!: string;
 
-    @Column('text', { nullable: true })
-    refreshToken!: string | null;
-
-    @OneToOne(() => UserEntity, {
-        cascade: true,
-        eager: true
-    })
+    @OneToOne(
+        () => UserEntity,
+        {
+            cascade: true,
+            eager: true
+        }
+    )
     @JoinColumn()
-    user!: UserEntity;
+    user?: Promise<UserEntity>;
 
-    toDomain(): Auth {
+    private constructor() {
+        super();
+    }
+
+    static create(auth: Auth): AuthEntity {
+        const entity = new AuthEntity();
+
+        return Object.assign(entity, {
+            id: auth.id,
+            email: auth.email,
+            name: auth.name,
+            password: auth.password,
+            role: auth.role,
+            createdAt: auth.createdAt,
+            updatedAt: auth.updatedAt,
+            user: auth.user ? Promise.resolve(UserEntity.fromDomain(auth.user)) : undefined
+        });
+    }
+
+    static fromDomain(auth: Auth): AuthEntity {
+        return AuthEntity.create(auth);
+    }
+
+    async toDomain(): Promise<Auth> {
+        const resolvedUser = this.user ? await this.user : undefined;
+
         return new Auth(
             this.id,
             this.email,
             this.name,
             this.password,
             this.role,
-            this.refreshToken,
             this.createdAt,
             this.updatedAt,
-            this.user?.toDomain()
+            resolvedUser ? await resolvedUser.toDomain() : undefined
         );
-    }
-
-    static fromDomain(auth: Auth): AuthEntity {
-        const entity = new AuthEntity();
-        entity.id = auth.id;
-        entity.email = auth.email;
-        entity.name = auth.name;
-        entity.password = auth.password;
-        entity.role = auth.role;
-        entity.refreshToken = auth.refreshToken;
-        entity.createdAt = auth.createdAt;
-        entity.updatedAt = auth.updatedAt;
-
-        if (auth.user) {
-            entity.user = UserEntity.fromDomain(auth.user);
-        }
-
-        return entity;
     }
 }
