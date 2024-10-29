@@ -5,6 +5,7 @@ import { userSchema, userUpdateSchema } from "../middlewares/validateRequest";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { roleMiddleware } from "../middlewares/roleMiddleware";
 import { IContainerResult } from "../../infrastructure/interfaces/IContainerResult";
+import { isDeletedMiddleware } from "../middlewares/deletedEntityMiddleware";
 
 export default async (router: Router): Promise<void> => {
   const { userController }: IContainerResult = await container();
@@ -15,25 +16,28 @@ export default async (router: Router): Promise<void> => {
     },
   });
 
-  // router.post(
-  //   "/v1/users",
-  //   authMiddleware,
-  //   roleMiddleware(['admin']),
-  //   validateBody(userSchema),
-  //   userController.createUser
-  // );
+  router.get("/v1/users", 
+    authMiddleware, 
+    isDeletedMiddleware, 
+    roleMiddleware(['admin']), 
+    userController.getAllUsers);
 
-  router.get("/v1/users", authMiddleware, roleMiddleware(['admin']), userController.getAllUsers);
-
-  router.get("/v1/users/:id", authMiddleware, userController.getUserById);
+  router.get("/v1/users/:id", 
+    isDeletedMiddleware, 
+    authMiddleware, 
+    roleMiddleware(['user']), 
+    userController.getUserById);
 
   router.put(
     "/v1/users/:id",
     authMiddleware,
-    roleMiddleware(['user','admin']),
+    roleMiddleware(['user', 'admin']),
     validateBody(userUpdateSchema),
     userController.updateUser
   );
 
-  router.delete("/v1/users/:id", authMiddleware, roleMiddleware(['admin']), userController.removeUser);
+  router.delete("/v1/users/:id",
+    authMiddleware,
+    roleMiddleware(['user', 'admin']),
+    userController.removeUser);
 };

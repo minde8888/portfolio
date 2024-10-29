@@ -6,7 +6,7 @@ export class RemoveUserUseCase {
   constructor(private userRepository: IUserRepository) { }
 
   async execute(id: string) {
-    if (uuidValidate(id)) {
+    if (!uuidValidate(id)) {
       throw new ValidationError("Invalid user ID");
     }
     await this.userRepository.remove(id);

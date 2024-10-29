@@ -1,9 +1,13 @@
 import "reflect-metadata";
 import express from "express";
+
 import { Database } from "./infrastructure/database/Database";
-import { errorMiddleware } from "./presentation/middlewares/errorMiddleware";
+
 import userRoutes from "./presentation/routes/userRoutes";
 import authRoutes from "./presentation/routes/authRoutes";
+
+import { isDeletedMiddleware } from "./presentation/middlewares/deletedEntityMiddleware";
+import { errorMiddleware } from "./presentation/middlewares/errorMiddleware";
 
 async function bootstrap() {
   const app = express();
@@ -19,6 +23,7 @@ async function bootstrap() {
 
   app.use("/api/", router);
   app.use(errorMiddleware);
+  app.use(isDeletedMiddleware);
 
   // Graceful shutdown handling
   const shutdown = async () => {

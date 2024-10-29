@@ -17,7 +17,8 @@ export function configureUserMapper(mapper: Mapper) {
         User,
         forMember(dest => dest.email, mapFrom(src => src.email)),
         forMember(dest => dest.name, mapFrom(src => src.name)),
-        forMember(dest => dest.role, mapFrom(src => src.role))
+        forMember(dest => dest.role, mapFrom(src => src.role)),
+        forMember(dest => dest.isDeleted, mapFrom(src => src.isDeleted))
       );
 
     // UpdateUserDTO to User mapping

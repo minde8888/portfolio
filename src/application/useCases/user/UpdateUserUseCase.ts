@@ -11,7 +11,7 @@ export class UpdateUserUseCase {
     updates: { email?: string; name?: string }
   ): Promise<User> {
 
-    if (uuidValidate(id)) {
+    if (!uuidValidate(id)) {
       throw new ValidationError("Invalid user ID");
     }
 

@@ -1,11 +1,15 @@
 import { Router } from "express";
 import { expressYupMiddleware } from 'express-yup-middleware';
+
 import { container } from "../../infrastructure/di/container";
-import { loginSchema, registerSchema } from "../middlewares/validateRequest";
 import { IContainerResult } from "../../infrastructure/interfaces/IContainerResult";
+import { adaptMiddleware } from "../../infrastructure/http/middleware/ExpressMiddlewareAdapter";
+
+import { loginSchema, registerSchema } from "../middlewares/validateRequest";
+import { isDeletedMiddleware } from "../middlewares/deletedEntityMiddleware";
+
 
 export default async (router: Router): Promise<void> => {
-
   const { authController }: IContainerResult = await container();
   const validateBody = (schema: any) => expressYupMiddleware({
     schemaValidator: {
@@ -16,6 +20,7 @@ export default async (router: Router): Promise<void> => {
   router.post(
     "/v1/login",
     validateBody(loginSchema),
+    isDeletedMiddleware, 
     authController.login
   );
 

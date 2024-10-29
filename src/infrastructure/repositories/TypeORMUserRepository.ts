@@ -30,6 +30,8 @@ export class TypeORMUserRepository implements IUserRepository {
 
   async findById(id: string): Promise<User | null> {
     const userEntity = await this.repository.findOne({ where: { id } });
+    console.log("repository",userEntity);
+    
     if (!userEntity) throw new UserNotFoundError(`User with id ${id} not found`); 
 
     return userEntity.toDomain();
