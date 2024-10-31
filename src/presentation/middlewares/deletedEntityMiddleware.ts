@@ -5,53 +5,20 @@ import { UserNotFoundError } from '../../utils/Errors/Errors';
 
 import { IDeletableEntity } from '../../domain/interfaces/IDeletableEntity';
 import { IMiddleware } from '../../domain/middleware/IMiddleware';
+import { IErrorResponse } from '../../domain/interfaces/IErrorResponse';
+
 import { adaptMiddleware } from '../../infrastructure/http/middleware/ExpressMiddlewareAdapter';
 
+
 export class DeletedEntityMiddleware implements IMiddleware {
-  private checkForDeletedEntity<T>(data: T): T {
-    // If it's null or not an object, return as is
-    if (!data || typeof data !== 'object') {
-      return data;
-    }
+  private handleError(res: Response, error: Error): Response<IErrorResponse> {
+    const status = error instanceof UserNotFoundError ? HttpStatus.NOT_FOUND : HttpStatus.INTERNAL_SERVER_ERROR;
+    const message = error instanceof UserNotFoundError ? error.message : 'Internal server error';
 
-    // Handle arrays
-    if (Array.isArray(data)) {
-      return (data
-        .map(item => this.checkForDeletedEntity(item))
-        .filter(item => {
-          if (this.isDeletableEntity(item)) {
-            return !item.isDeleted;
-          }
-          return true;
-        }) as unknown) as T;
-    }
-
-    // Deep clone the object
-    const clonedData = { ...data } as T;
-
-    // Check each property in the object
-    for (const key in clonedData) {
-      const value = clonedData[key];
-      
-      if (value && typeof value === 'object') {
-        // Recursively check nested objects
-        clonedData[key] = this.checkForDeletedEntity(value);
-
-        // Type guard to ensure we can access isDeleted
-        if (this.isDeletableEntity(value)) {
-          if (value.isDeleted) {
-            throw new UserNotFoundError('Entity not found');
-          }
-        }
-      }
-    }
-
-    // Check if the current object is a deleted entity
-    if (this.isDeletableEntity(clonedData) && clonedData.isDeleted) {
-      throw new UserNotFoundError('Entity not found');
-    }
-
-    return clonedData;
+    return res.status(status).json({
+      status,
+      error: message,
+    });
   }
 
   private isDeletableEntity(value: unknown): value is IDeletableEntity {
@@ -63,25 +30,51 @@ export class DeletedEntityMiddleware implements IMiddleware {
     );
   }
 
-  handle(request: Request, response: Response, next: NextFunction): void {
-    const self = this;
-    const originalJson = response.json;
+  private processArrayData<T>(data: T[]): T[] {
+    return data
+      .map(item => this.processEntityData(item))
+      .filter(item => !this.isDeletableEntity(item) || !item.isDeleted);
+  }
 
-    response.json = function(this: Response, data: any) {
-      try {
-        const filteredData = self.checkForDeletedEntity(data);
-        return originalJson.call(this, filteredData);
-      } catch (error) {
-        if (error instanceof UserNotFoundError) {
-          return this.status(HttpStatus.NOT_FOUND).json({
-            status: HttpStatus.NOT_FOUND,
-            error: error.message
-          });
+  private processObjectData<T extends object>(data: T): T {
+    const processedData = { ...data };
+
+    for (const [key, value] of Object.entries(processedData)) {
+      if (value && typeof value === 'object') {
+        processedData[key as keyof T] = this.processEntityData(value) as T[keyof T];
+
+        if (this.isDeletableEntity(value) && value.isDeleted) {
+          throw new UserNotFoundError('Entity not found');
         }
-        return this.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: 'Internal server error'
-        });
+      }
+    }
+
+    if (this.isDeletableEntity(processedData) && processedData.isDeleted) {
+      throw new UserNotFoundError('Entity not found');
+    }
+
+    return processedData;
+  }
+
+  private processEntityData<T>(data: T): T {
+    if (!data || typeof data !== 'object') return data;
+
+    if (Array.isArray(data)) {
+      return this.processArrayData(data) as unknown as T;
+    }
+
+    return this.processObjectData(data as object) as T;
+  }
+
+  handle(request: Request, response: Response, next: NextFunction): void {
+    const originalJson = response.json.bind(response);
+
+    response.json = (data: any) => {
+      try {
+        const filteredData = this.processEntityData(data);
+        return originalJson(filteredData);
+      } catch (error) {
+        return this.handleError(response, error as Error);
       }
     };
 

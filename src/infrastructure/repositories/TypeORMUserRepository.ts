@@ -2,7 +2,7 @@ import { Repository } from "typeorm";
 import { HttpStatus } from '@nestjs/common';
 
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { User } from "../../domain/entities/User";
+import { User } from "../../domain/entities/user/User";
 
 import { EmailAlreadyExistsError, UserNotFoundError, UserUpdateError } from "../../utils/Errors/Errors";
 

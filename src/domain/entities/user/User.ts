@@ -1,8 +1,9 @@
 import { AutoMap } from '@automapper/classes';
-import { BaseModel } from './BaseModel';
-import { IDeletableEntity } from '../interfaces/IDeletableEntity';
+import { BaseEntity } from '../base/BaseEntity';
+import { IDeletableEntity } from '../../../domain/interfaces/IDeletableEntity';
+import { UserRole } from './UserRole';
 
-export class User extends BaseModel implements IDeletableEntity {
+export class User extends BaseEntity implements IDeletableEntity {
     @AutoMap()
     email: string;
 
@@ -10,7 +11,7 @@ export class User extends BaseModel implements IDeletableEntity {
     name: string;
 
     @AutoMap()
-    role: string;
+    role: UserRole;
 
     @AutoMap()
     refreshToken: string | null;
@@ -22,7 +23,7 @@ export class User extends BaseModel implements IDeletableEntity {
         id: string,
         email: string,
         name: string,
-        role: string,
+        role: UserRole = UserRole.USER,
         refreshToken: string | null,
         createdAt: Date | null = null,
         updatedAt: Date | null = null,

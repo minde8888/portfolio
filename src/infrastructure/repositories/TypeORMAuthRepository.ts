@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { HttpStatus } from '@nestjs/common';
 
 import { IAuthRepository } from '../../domain/repositories/IAuthRepository';
-import { Auth } from '../../domain/entities/Auth';
+import { Auth } from '../../domain/entities/auth/Auth';
 
 import { AuthEntity } from '../entities/AuthEntity';
 

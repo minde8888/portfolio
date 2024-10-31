@@ -2,7 +2,7 @@ import { Mapper } from '@automapper/core';
 import { IAuthService } from '../../../domain/services/IAuthService';
 import { IUserRepository } from '../../../domain/repositories/IUserRepository';
 import { UserDTO } from '../../dtos/UserDTO';
-import { User } from '../../../domain/entities/User';
+import { User } from '../../../domain/entities/user/User';
 import { UserNotFoundError } from '../../../utils/Errors/Errors';
 
 
@@ -32,6 +32,12 @@ export class LoginUseCase {
     await this.userRepository.update(user.id, { refreshToken });
 
     const userDTO = this.mapper.map(user, UserDTO, User);
+
+    console.log({ 
+      token: { accessToken, refreshToken },
+      userDTO 
+    });
+    
 
     return { 
       token: { accessToken, refreshToken },

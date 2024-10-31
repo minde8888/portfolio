@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { LoginUseCase } from './../../application/useCases/auth/LoginUseCase';
 import { RefreshTokenUseCase } from '../../application/useCases/auth/RefreshTokenUseCase';
 import { RegisterUseCase } from "../../application/useCases/auth/RegisterUseCase";
-import { Login } from "../../domain/entities/Login";
+import { Login } from "../../domain/entities/auth/Login";
 import { IDecodedToken } from "../../infrastructure/interfaces/IDecodedToken";
 
 export class AuthController {

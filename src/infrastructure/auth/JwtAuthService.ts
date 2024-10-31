@@ -7,8 +7,8 @@ import { IDecodedToken } from "../interfaces/IDecodedToken";
 
 import { IAuthService } from './../../domain/services/IAuthService';
 import { IAuthRepository } from "../../domain/repositories/IAuthRepository";
-import { User } from "../../domain/entities/User";
-import { Auth } from "../../domain/entities/Auth";
+import { User } from "../../domain/entities/user/User";
+import { Auth } from "../../domain/entities/auth/Auth";
 
 export class JwtAuthService implements IAuthService {
 

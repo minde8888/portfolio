@@ -1,8 +1,8 @@
 import { AutoMap } from '@automapper/classes';
 
-export abstract class BaseModel {
+export abstract class BaseEntity {
     @AutoMap()
-    id!: string;
+    id: string;
 
     @AutoMap()
     createdAt: Date | null;
@@ -19,4 +19,5 @@ export abstract class BaseModel {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
 }

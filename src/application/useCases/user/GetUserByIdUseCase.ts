@@ -2,7 +2,7 @@ import { validate as uuidValidate } from 'uuid';
 import { Mapper } from '@automapper/core';
 
 import { UserNotFoundError, ValidationError } from "../../../utils/Errors/Errors";
-import { User } from "../../../domain/entities/User";
+import { User } from "../../../domain/entities/user/User";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { ICacheService } from "../../../domain/services/ICacheService";
 import { UserDTO } from '../../../application/dtos/UserDTO';

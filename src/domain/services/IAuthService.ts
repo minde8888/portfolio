@@ -1,6 +1,6 @@
 import { IDecodedToken } from "src/infrastructure/interfaces/IDecodedToken";
 import { Auth } from "../entities/Auth";
-import { User } from "../entities/User";
+import { User } from "../entities/user/User";
 
 export interface IAuthService {
   validateUser(email: string, password: string): Promise<Auth | null>;

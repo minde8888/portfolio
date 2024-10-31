@@ -1,8 +1,8 @@
 import { AutoMap } from '@automapper/classes';
-import { BaseModel } from './BaseModel';
-import { User } from './User';
+import { BaseEntity } from '../base/BaseEntity';
+import { User } from '../user/User';
 
-export class Auth extends BaseModel {
+export class Auth extends BaseEntity {
     @AutoMap()
     email: string;
 

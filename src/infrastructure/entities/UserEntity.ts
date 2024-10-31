@@ -1,6 +1,6 @@
 import { Entity, Column, OneToOne } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
-import { User } from '../../domain/entities/User';
+import { User } from '../../domain/entities/user/User';
 import { AuthEntity } from './AuthEntity';
 
 @Entity('users')
