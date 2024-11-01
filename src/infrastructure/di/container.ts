@@ -1,6 +1,6 @@
 import { createMapper } from '@automapper/core';
 import { classes } from '@automapper/classes';
-import { configureUserMapper } from '../../utils/mappers/userMapper';
+import { configureUserMapper } from '../../application/mappers/userMapper';
 import { ConfigurableCache } from '../cache/ConfigurableCache';
 import { GetAllUsersUseCase } from "../../application/useCases/user/GetAllUsersUseCase";
 import { UserEntity } from "../entities/UserEntity";

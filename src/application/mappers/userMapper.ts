@@ -1,5 +1,5 @@
 import { Mapper, createMap, forMember, mapFrom } from '@automapper/core';
-import { UserDTO } from '../../application/dtos/UserDTO';
+import { UserDTO } from '../dtos/UserDTO';
 import { Auth } from '../../domain/entities/auth/Auth';
 import { User } from '../../domain/entities/user/User';
 

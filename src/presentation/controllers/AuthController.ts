@@ -27,11 +27,7 @@ export class AuthController {
   refreshToken = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
     const result = await this.refreshTokenUseCase.execute(refreshToken);
-    if (result) {
-      res.json(result);
-    } else {
-      res.status(401).json({ message: "Invalid refresh token" });
-    }
+    res.json(result);
   };
 
   verifyToken = async (token: string): Promise<IDecodedToken> => {
