@@ -1,94 +1,32 @@
 import { Repository } from "typeorm";
-import { HttpStatus } from '@nestjs/common';
-
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/user/User";
-
-import { EmailAlreadyExistsError, NotFoundError, UserUpdateError } from "../../utils/Errors/Errors";
-
 import { UserEntity } from "../entities/UserEntity";
+import { BaseRepository } from "./BaseRepository";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { EmailAlreadyExistsError } from "../../utils/Errors/Errors";
 
-export class TypeORMUserRepository implements IUserRepository {
-  constructor(private readonly repository: Repository<UserEntity>) { }
-
-  async create(user: User): Promise<{ status: number; error?: string }> {
-    try {
-      const existingUser = await this.repository.findOne({ where: { email: user.email } });
-      if (existingUser) {
-        throw new EmailAlreadyExistsError();
-      }
-
-      const userEntity = UserEntity.fromDomain(user);
-      userEntity.createdAt = new Date();
-      await this.repository.save(userEntity);
-
-      return { status: HttpStatus.CREATED };
-    } catch (error) {
-
-      throw error;
-    }
-  }
-
-  async findById(id: string): Promise<User | null> {
-    const userEntity = await this.repository.findOne({ where: { id } });
-    console.log("repository",userEntity);
-    
-    if (!userEntity) throw new NotFoundError(`User with id ${id} not found`); 
-
-    return userEntity.toDomain();
-  }
-
-  async getAll(): Promise<User[] | undefined> {
-    const userEntities = await this.repository.find({ 
-      where: { isDeleted: false } 
-    });
-
-    return userEntities.map(entity => entity.toDomain());
-  }
-
-  async findByEmail(email: string): Promise<User | null> {
-    const userEntity = await this.repository.findOne({ where: { email } });
-    if (!userEntity) throw new NotFoundError(`User with email ${email} not found`);
-    
-    return userEntity.toDomain();
-  }
-
-  async update(id: string, userData: Partial<User>): Promise<User> {
-    const userEntity = await this.repository.findOne({ where: { id } });
-    if (!userEntity) {
-      throw new NotFoundError(`User with id ${id} not found`);
+export class TypeORMUserRepository extends BaseRepository<UserEntity, User> implements IUserRepository {
+    constructor(repository: Repository<UserEntity>) {
+        super(repository);
     }
 
-    try {
-      const updatedData = { ...userEntity, ...userData };
-      updatedData.updatedAt = new Date();
-
-      await this.repository.save(UserEntity.fromDomain(updatedData));
-      const updatedEntity = await this.repository.findOne({ where: { id } });
-      if (!updatedEntity) {
-        throw new UserUpdateError('User not found after update');
-      }
-
-      return updatedEntity.toDomain();
-    } catch (error) {
-
-      throw new UserUpdateError('Failed to update user');
-    }
-  }
-
-  async remove(id: string): Promise<{ status: number; error?: string }> {
-    const userEntity = await this.repository.findOne({ where: { id } });
-    if (!userEntity) {
-      throw new NotFoundError(`User with id ${id} not found`);
+    async findByEmail(email: string): Promise<User | null> {
+        return this.findByProperty('email', email);
     }
 
-    try {
-      userEntity.isDeleted = true;
-      await this.repository.save(userEntity);
-      
-      return { status: HttpStatus.OK };
-    } catch (error) {
-      throw error;
+    async create(user: User): Promise<{ status: number; error?: string }> {
+        const existingUser = await this.findByEmail(user.email);
+        if (existingUser) {
+            throw new EmailAlreadyExistsError();
+        }
+        return super.create(user);
     }
-  }
+
+    protected toDomain(entity: UserEntity): User {
+        return entity.toDomain();
+    }
+
+    protected toEntity(domain: User): UserEntity {
+        return UserEntity.fromDomain(domain);
+    }
 }
