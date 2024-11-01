@@ -1,7 +1,7 @@
 import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 
-import { AuthError } from "../../utils/Errors/Errors";
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "../../utils/Errors/Errors";
 
 import { IDecodedToken } from "../interfaces/IDecodedToken";
 
@@ -20,12 +20,25 @@ export class JwtAuthService implements IAuthService {
   }
 
   async validateUser(email: string, password: string): Promise<Auth | null> {
-    
-    const user = await this.authRepository.findByEmail(email);
-    if (user && await bcrypt.compare(password, user.password)) {
+    try {
+      const user = await this.authRepository.findByEmail(email);
+
+      if (!user) {
+        throw new NotFoundError("The email address or password is incorrect. Please retry");
+      }
+
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        throw new ForbiddenError("The email address or password is incorrect. Please retry");
+      }
+
       return user;
+    } catch (error: any) {
+      if (error instanceof NotFoundError || error instanceof ForbiddenError) {
+        throw error;
+      }
+      throw new Error(`Authentication failed: ${error.message}`);
     }
-    return null;
   }
 
   generateAccessToken(user: User): string {
@@ -54,11 +67,11 @@ export class JwtAuthService implements IAuthService {
       return decoded;
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
-        throw new AuthError('Token has expired');
+        throw new UnauthorizedError();
       } else if (error instanceof jwt.JsonWebTokenError) {
-        throw new AuthError('Invalid token');
+        throw new UnauthorizedError();
       }
-      throw new AuthError('Token verification failed');
+      throw new UnauthorizedError();
     }
   }
 
@@ -68,11 +81,11 @@ export class JwtAuthService implements IAuthService {
       return decoded;
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
-        throw new AuthError('Refresh token has expired');
+        throw new UnauthorizedError();
       } else if (error instanceof jwt.JsonWebTokenError) {
-        throw new AuthError('Invalid refresh token');
+        throw new UnauthorizedError();
       }
-      throw new AuthError('Refresh token verification failed');
+      throw new UnauthorizedError();
     }
   }
 }

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { expressYupMiddleware } from 'express-yup-middleware';
 import { container } from "../../infrastructure/di/container";
-import { userSchema, userUpdateSchema } from "../middlewares/validateRequest";
+import { userSchema, userUpdateSchema } from "../validation/validateRequest";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { roleMiddleware } from "../middlewares/roleMiddleware";
 import { IContainerResult } from "../../infrastructure/interfaces/IContainerResult";

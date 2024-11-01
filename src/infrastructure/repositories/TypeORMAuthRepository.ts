@@ -13,17 +13,22 @@ export class TypeORMAuthRepository implements IAuthRepository {
     constructor(private repository: Repository<AuthEntity>) { }
 
     async findByEmail(email: string): Promise<Auth | null> {
-        const user = await this.repository.findOne({ where: { email } });
-        return user ? user.toDomain() : null;
+        try {
+            const user = await this.repository.findOne({ where: { email } });
+            return user ? user.toDomain() : null;
+        } catch (error) {
+            throw error;
+        }
     }
 
     async create(auth: Omit<Auth, 'id'>): Promise<{ status: number; error?: string; auth: Auth }> {
         try {
             const entity = AuthEntity.fromDomain(
-                new Auth(uuidv4(), auth.email, auth.name, auth.password, auth.role)
+                new Auth(uuidv4(), auth.email, auth.name, auth.password)
             );
+            entity.updatedAt = new Date();
             const savedEntity = await this.repository.save(entity);
-            
+
             return {
                 status: HttpStatus.CREATED,
                 auth: await savedEntity.toDomain()
@@ -54,7 +59,6 @@ export class TypeORMAuthRepository implements IAuthRepository {
         if (authData.email) entityData.email = authData.email;
         if (authData.name) entityData.name = authData.name;
         if (authData.password) entityData.password = authData.password;
-        if (authData.role) entityData.role = authData.role;
 
         return entityData;
     }

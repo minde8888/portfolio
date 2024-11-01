@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { HttpStatus } from '@nestjs/common';
 
-import { UserNotFoundError } from '../../utils/Errors/Errors';
+import { NotFoundError } from '../../utils/Errors/Errors';
 
 import { IDeletableEntity } from '../../domain/interfaces/IDeletableEntity';
 import { IMiddleware } from '../../domain/middleware/IMiddleware';
@@ -12,8 +12,8 @@ import { adaptMiddleware } from '../../infrastructure/http/middleware/ExpressMid
 
 export class DeletedEntityMiddleware implements IMiddleware {
   private handleError(res: Response, error: Error): Response<IErrorResponse> {
-    const status = error instanceof UserNotFoundError ? HttpStatus.NOT_FOUND : HttpStatus.INTERNAL_SERVER_ERROR;
-    const message = error instanceof UserNotFoundError ? error.message : 'Internal server error';
+    const status = error instanceof NotFoundError ? HttpStatus.NOT_FOUND : HttpStatus.INTERNAL_SERVER_ERROR;
+    const message = error instanceof NotFoundError ? error.message : 'Internal server error';
 
     return res.status(status).json({
       status,
@@ -44,13 +44,13 @@ export class DeletedEntityMiddleware implements IMiddleware {
         processedData[key as keyof T] = this.processEntityData(value) as T[keyof T];
 
         if (this.isDeletableEntity(value) && value.isDeleted) {
-          throw new UserNotFoundError('Entity not found');
+          throw new NotFoundError('Entity not found');
         }
       }
     }
 
     if (this.isDeletableEntity(processedData) && processedData.isDeleted) {
-      throw new UserNotFoundError('Entity not found');
+      throw new NotFoundError('Entity not found');
     }
 
     return processedData;

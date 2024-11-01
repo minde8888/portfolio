@@ -16,8 +16,8 @@ export class EmailAlreadyExistsError extends AppError {
   }
 }
 
-export class UserNotFoundError extends AppError {
-  constructor(message: string = "User does not exist") {
+export class NotFoundError extends AppError {
+  constructor(message: string) {
     super(message, 404, "UserNotFoundError");
   }
 }
@@ -29,8 +29,9 @@ export class UserUpdateError extends AppError {
 }
 
 export class ValidationError extends AppError {
-  constructor(message: string = "Validation failed") {
-    super(message, 400, "ValidationError");
+  constructor(message: string) {
+    super(message, 400);
+    this.name = 'ValidationError';
   }
 }
 
@@ -39,10 +40,18 @@ export class RedisError extends AppError {
     super(message, 500, "RedisError");
   }
 }
-export class AuthError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'AuthError';
+
+export class UnauthorizedError extends AppError {
+  constructor(message: string = 'Unauthorized access') {
+    super(message, 401);
+    this.name = 'UnauthorizedError';
+  }
+}
+
+export class ForbiddenError extends AppError {
+  constructor(message: string = 'Forbidden access') {
+    super(message, 403);
+    this.name = 'ForbiddenError';
   }
 }
 
@@ -59,3 +68,4 @@ export class UpdateError extends Error {
     this.name = 'UpdateError';
   }
 }
+

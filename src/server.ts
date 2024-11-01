@@ -8,6 +8,7 @@ import authRoutes from "./presentation/routes/authRoutes";
 
 import { isDeletedMiddleware } from "./presentation/middlewares/deletedEntityMiddleware";
 import { errorMiddleware } from "./presentation/middlewares/errorMiddleware";
+import { IAppError } from "./domain/interfaces/IErrorResponse";
 
 async function bootstrap() {
   const app = express();
@@ -21,19 +22,26 @@ async function bootstrap() {
   await userRoutes(router);
   await authRoutes(router);
 
-  app.use("/api/", router);
-  app.use(errorMiddleware);
+  app.use("/api/", router);  
   app.use(isDeletedMiddleware);
+  app.use(errorMiddleware);
 
   // Graceful shutdown handling
-  const shutdown = async () => {
-    console.log('Shutting down gracefully...');
-    await database.disconnect();
-    process.exit(0);
+  const shutdown = async (signal: string) => {
+    console.log(`Received ${signal}. Shutting down gracefully...`);
+    try {
+      await database.disconnect();
+      console.log('Database disconnected successfully');
+      process.exit(0);
+    } catch (error) {
+      console.error('Error during shutdown:', error);
+      process.exit(1);
+    }
   };
 
-  process.on('SIGTERM', shutdown);
-  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+
 
   try {
     await database.connect();

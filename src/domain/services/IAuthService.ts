@@ -1,5 +1,5 @@
 import { IDecodedToken } from "src/infrastructure/interfaces/IDecodedToken";
-import { Auth } from "../entities/Auth";
+import { Auth } from "../entities/auth/Auth";
 import { User } from "../entities/user/User";
 
 export interface IAuthService {

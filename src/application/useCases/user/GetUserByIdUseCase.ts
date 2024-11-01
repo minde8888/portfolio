@@ -1,7 +1,7 @@
 import { validate as uuidValidate } from 'uuid';
 import { Mapper } from '@automapper/core';
 
-import { UserNotFoundError, ValidationError } from "../../../utils/Errors/Errors";
+import { NotFoundError, ValidationError } from "../../../utils/Errors/Errors";
 import { User } from "../../../domain/entities/user/User";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { ICacheService } from "../../../domain/services/ICacheService";
@@ -30,7 +30,7 @@ export class GetUserByIdUseCase {
     const user = await this.userRepository.findById(id);
     
     if (!user) {
-      throw new UserNotFoundError();
+      throw new NotFoundError("User dose not exist");
     }
 
     const userDTO = this.mapper.map(user, UserDTO, User);

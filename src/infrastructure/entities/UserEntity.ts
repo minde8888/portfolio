@@ -1,35 +1,47 @@
 import { Entity, Column, OneToOne } from 'typeorm';
+
 import { BaseEntity } from './BaseEntity';
-import { User } from '../../domain/entities/user/User';
 import { AuthEntity } from './AuthEntity';
+
+import { User } from '../../domain/entities/user/User';
+import { UserRole } from '../../domain/entities/user/UserRole';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {
     @Column({ unique: true, type: 'varchar' })
-    email: string;
+    email!: string;
 
     @Column({ type: 'varchar' })
-    name: string;
+    name!: string;
 
-    @Column({ type: 'varchar', default: 'user' })
-    role: string;
+    @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+    role!: UserRole;
 
     @Column({ type: 'text', nullable: true, default: null })
-    refreshToken: string | null;
+    refreshToken!: string | null;
 
     @Column({ name: 'is_deleted', type: 'boolean', default: false })
-    isDeleted: boolean;
+    isDeleted!: boolean;
 
     @OneToOne(() => AuthEntity, auth => auth.user)
     auth!: AuthEntity;
 
-    constructor(email: string = '', name: string = '', role: string = 'user', refreshToken: string | null = null) {
-        super();
-        this.email = email;
-        this.name = name;
-        this.role = role;
-        this.refreshToken = refreshToken;
-        this.isDeleted = false;
+    static create(user: User): UserEntity {
+        const entity = new UserEntity();
+
+        return Object.assign(entity, {
+           id : user.id,
+           email : user.email,
+           name : user.name,
+           role : user.role,
+           refreshToken : user.refreshToken,
+           createdAt : user.createdAt,
+           updatedAt : user.updatedAt
+        });
+    }
+
+    static fromDomain(user: User): UserEntity {
+        return UserEntity.create(user);
     }
 
     toDomain(): User {
@@ -43,17 +55,5 @@ export class UserEntity extends BaseEntity {
             this.updatedAt,
             this.isDeleted
         );
-    }
-
-    static fromDomain(user: User): UserEntity {
-        const entity = new UserEntity();
-        entity.id = user.id;
-        entity.email = user.email;
-        entity.name = user.name;
-        entity.role = user.role;
-        entity.refreshToken = user.refreshToken;
-        entity.createdAt = user.createdAt;
-        entity.updatedAt = user.updatedAt;
-        return entity;
     }
 } 

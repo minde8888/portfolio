@@ -12,9 +12,6 @@ export class Auth extends BaseEntity {
     @AutoMap()
     password: string;
 
-    @AutoMap()
-    role: string;
-
     @AutoMap(() => User)
     user?: User;
 
@@ -23,7 +20,6 @@ export class Auth extends BaseEntity {
         email: string,
         name: string,
         password: string,
-        role: string,
         createdAt:Date | null = null,
         updatedAt: Date | null = null,
         user?: User
@@ -32,7 +28,6 @@ export class Auth extends BaseEntity {
         this.email = email;
         this.name = name;
         this.password = password;
-        this.role = role;
         this.user = user;
     }
 }

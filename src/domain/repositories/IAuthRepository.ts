@@ -1,4 +1,4 @@
-import { Auth } from "../entities/Auth";
+import { Auth } from "../entities/auth/Auth";
 
 export interface IAuthRepository {
     findByEmail(email: string): Promise<Auth | null>;

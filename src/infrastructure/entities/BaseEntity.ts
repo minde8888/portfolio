@@ -4,9 +4,15 @@ export abstract class BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ 
+        type: 'timestamp',
+        nullable: true 
+    })
     createdAt!: Date | null;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ 
+        type: 'timestamp',
+        nullable: true 
+    })
     updatedAt!: Date | null;
 }

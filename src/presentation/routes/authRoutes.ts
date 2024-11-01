@@ -3,10 +3,12 @@ import { expressYupMiddleware } from 'express-yup-middleware';
 
 import { container } from "../../infrastructure/di/container";
 import { IContainerResult } from "../../infrastructure/interfaces/IContainerResult";
-import { adaptMiddleware } from "../../infrastructure/http/middleware/ExpressMiddlewareAdapter";
+import { asyncHandler } from "../../infrastructure/utils/asyncHandler";
 
-import { loginSchema, registerSchema } from "../middlewares/validateRequest";
+import { loginSchema, registerSchema } from "../validation/validateRequest";
 import { isDeletedMiddleware } from "../middlewares/deletedEntityMiddleware";
+
+
 
 
 export default async (router: Router): Promise<void> => {
@@ -21,14 +23,14 @@ export default async (router: Router): Promise<void> => {
     "/v1/login",
     validateBody(loginSchema),
     isDeletedMiddleware, 
-    authController.login
+    asyncHandler(authController.login)
   );
 
   router.post(
     "/v1/register",
     validateBody(registerSchema),
-    authController.register
+    asyncHandler(authController.register)
   );
 
-  router.post("/v1/refresh-token", authController.refreshToken);
+  router.post("/v1/refresh-token", asyncHandler(authController.refreshToken));
 };

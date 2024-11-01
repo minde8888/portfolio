@@ -1,4 +1,4 @@
-import { UserNotFoundError, UserUpdateError, ValidationError } from "../../../utils/Errors/Errors";
+import { NotFoundError, ValidationError } from "../../../utils/Errors/Errors";
 import { User } from "../../../domain/entities/user/User";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { validate as uuidValidate } from 'uuid';
@@ -16,9 +16,13 @@ export class UpdateUserUseCase {
     }
 
     const existingUser = await this.userRepository.findById(id);
-    
+
     if (!existingUser) {
-      throw new UserNotFoundError(`User with id ${id} not found`);
+      throw new NotFoundError(`User with id ${id} not found`);
+    }
+
+    if (existingUser.isDeleted) {
+      throw new NotFoundError(`User not found`);
     }
 
     if (updates.email !== undefined) existingUser.email = updates.email;

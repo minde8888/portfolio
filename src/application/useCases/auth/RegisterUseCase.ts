@@ -6,8 +6,10 @@ import { IAuthRepository } from '../../../domain/repositories/IAuthRepository';
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { Auth } from '../../../domain/entities/auth/Auth';
 import { User } from "../../../domain/entities/user/User";
+import { UserRole } from "../../../domain/entities/user/UserRole";
 
 import { handleError } from "../../../utils/Errors/handleError";
+
 
 export class RegisterUseCase {
     constructor(
@@ -39,14 +41,14 @@ export class RegisterUseCase {
             const authCreationResult = await this.authRepository.create({
                 email,
                 password: hashedPassword,
-                role,
                 name: name,
-                createdAt: new Date(),
+                createdAt: null,
                 updatedAt: null
             });
 
             const { auth: auth } = authCreationResult;
             const user = this.mapper.map(auth, Auth, User);
+            user.role = role as UserRole;;
             await this.userRepository.create(user);
 
             return {

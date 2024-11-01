@@ -1,31 +1,20 @@
 import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
+
 import { BaseEntity } from './BaseEntity';
-import { Auth } from '../../domain/entities/auth/Auth';
 import { UserEntity } from './UserEntity';
+
+import { Auth } from '../../domain/entities/auth/Auth';
 
 @Entity('auth')
 export class AuthEntity extends BaseEntity {
-    @Column({
-        unique: true,
-        type: 'varchar'
-    })
+    @Column({ unique: true, type: 'varchar' })
     email!: string;
 
-    @Column({
-        type: 'varchar'
-    })
+    @Column({ type: 'varchar' })
     name!: string;
 
-    @Column({
-        type: 'varchar'
-    })
+    @Column({ type: 'varchar' })
     password!: string;
-
-    @Column({
-        type: 'varchar',
-        default: 'user'
-    })
-    role!: string;
 
     @OneToOne(
         () => UserEntity,
@@ -49,7 +38,6 @@ export class AuthEntity extends BaseEntity {
             email: auth.email,
             name: auth.name,
             password: auth.password,
-            role: auth.role,
             createdAt: auth.createdAt,
             updatedAt: auth.updatedAt,
             user: auth.user ? Promise.resolve(UserEntity.fromDomain(auth.user)) : undefined
@@ -68,10 +56,9 @@ export class AuthEntity extends BaseEntity {
             this.email,
             this.name,
             this.password,
-            this.role,
             this.createdAt,
             this.updatedAt,
-            resolvedUser ? await resolvedUser.toDomain() : undefined
+            resolvedUser ? resolvedUser.toDomain() : undefined
         );
     }
 }
