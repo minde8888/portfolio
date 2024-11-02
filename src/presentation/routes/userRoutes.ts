@@ -19,7 +19,7 @@ export default async (router: Router): Promise<void> => {
   router.get("/v1/users", 
     authMiddleware, 
     isDeletedMiddleware, 
-    roleMiddleware(['admin']), 
+    roleMiddleware(['user','admin']), 
     userController.getAllUsers);
 
   router.get("/v1/users/:id", 

@@ -14,11 +14,7 @@ export function configureUserMapper(mapper: Mapper) {
     forMember((destination) => destination.id, mapFrom((source) => source.id)),
     forMember((destination) => destination.email, mapFrom((source) => source.email)),
     forMember((destination) => destination.name, mapFrom((source) => source.name)),
-    forMember((destination) => destination.role, mapFrom(() => UserRole.USER)),
-    forMember((destination) => destination.refreshToken, mapFrom(() => null)),
-    forMember((destination) => destination.createdAt, mapFrom((source) => source.createdAt)),
-    forMember((destination) => destination.updatedAt, mapFrom((source) => source.updatedAt)),
-    forMember((destination) => destination.isDeleted, mapFrom(() => false)));
+    forMember((destination) => destination.role, mapFrom(() => UserRole.USER)));
 
   // UserDTO to User mapping
   createMap(
@@ -29,6 +25,16 @@ export function configureUserMapper(mapper: Mapper) {
     forMember(dest => dest.email, mapFrom(src => src.email)),
     forMember(dest => dest.name, mapFrom(src => src.name)),
     forMember(dest => dest.isDeleted, mapFrom(src => src.isDeleted))
+  );
+
+    //User to UserDTO mapping
+  createMap(
+    mapper,   
+    User,
+    UserDTO,
+    forMember(dest => dest.id, mapFrom(src => src.id)),
+    forMember(dest => dest.email, mapFrom(src => src.email)),
+    forMember(dest => dest.name, mapFrom(src => src.name))
   );
 
   // UpdateUserDTO to User mapping

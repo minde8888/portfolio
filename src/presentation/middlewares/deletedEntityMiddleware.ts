@@ -44,13 +44,13 @@ export class DeletedEntityMiddleware implements IMiddleware {
         processedData[key as keyof T] = this.processEntityData(value) as T[keyof T];
 
         if (this.isDeletableEntity(value) && value.isDeleted) {
-          throw new NotFoundError(`Password or email is incorrect`);
+          throw new NotFoundError(`User not found or has been deleted`);
         }
       }
     }
 
     if (this.isDeletableEntity(processedData) && processedData.isDeleted) {
-      throw new NotFoundError(`Password or email is incorrect`);
+      throw new NotFoundError(`User not found or has been deleted`);
     }
 
     return processedData;
