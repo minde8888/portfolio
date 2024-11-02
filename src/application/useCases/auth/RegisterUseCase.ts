@@ -9,8 +9,7 @@ import { Auth } from '../../../domain/entities/auth/Auth';
 import { User } from "../../../domain/entities/user/User";
 import { UserRole } from "../../../domain/entities/user/UserRole";
 
-import { handleError } from "../../../utils/Errors/handleError";
-
+import { MapperError } from "../../../utils/Errors/Errors";
 
 export class RegisterUseCase {
     constructor(
@@ -19,10 +18,14 @@ export class RegisterUseCase {
         private mapper: Mapper
     ) { }
 
-    async execute(email: string, name: string, password: string, role: string): Promise<{ status: number; error?: string }> {
+    async execute(
+        email: string, 
+        name: string, 
+        password: string, 
+        role = "user"): Promise<{ status: number; error?: string }> {
 
         try {
-            if (!email || !name || !password || !role) {
+            if (!email || !name || !password ) {
                 return {
                     status: HttpStatus.BAD_REQUEST,
                     error: 'Missing required fields'
@@ -42,14 +45,22 @@ export class RegisterUseCase {
             const authCreationResult = await this.authRepository.create({
                 email,
                 password: hashedPassword,
-                name: name,
+                name,
                 createdAt: null,
                 updatedAt: null
             });
 
-            const { auth: auth } = authCreationResult;
-            const user = this.mapper.map(auth, Auth, User);
-            user.role = role as UserRole;;
+            const { data } = authCreationResult;
+
+            const user = this.mapper.map(data, Auth, User);
+            if (!user) {
+                throw new MapperError(`Failed to map Auth to User: ${authCreationResult.data}`);
+            }
+            
+            if (role !== 'user') {
+                user.role = role as UserRole;
+            }
+            
             await this.userRepository.create(user);
 
             return {
@@ -57,7 +68,7 @@ export class RegisterUseCase {
             };
 
         } catch (error) {
-            return handleError(error);
+            throw error;
         }
     }
 }

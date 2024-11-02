@@ -25,12 +25,19 @@ export abstract class BaseRepository<T extends ObjectLiteral, D> implements IBas
         return Promise.all(entities.map(entity => this.toDomain(entity)));
     }
 
-    async create(domain: D): Promise<{ status: number; error?: string }> {
+    async create(domain: D): Promise<{ status: number; error?: string; data?: D }> {
         try {
             const entity = await this.toEntity(domain);
             (entity as any).createdAt = new Date();
-            await this.repository.save(entity);
-            return { status: HttpStatus.CREATED };
+
+            const savedEntity = await this.repository.save(entity);
+
+            const domainResult = await this.toDomain(savedEntity);
+
+                return { 
+                status: HttpStatus.CREATED, 
+                data: domainResult 
+            };
         } catch (error) {
             throw error;
         }

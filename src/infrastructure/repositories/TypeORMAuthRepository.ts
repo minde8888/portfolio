@@ -1,11 +1,12 @@
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { HttpStatus } from '@nestjs/common';
+
 import { IAuthRepository } from '../../domain/repositories/IAuthRepository';
 import { Auth } from '../../domain/entities/auth/Auth';
+
 import { AuthEntity } from '../entities/AuthEntity';
+
 import { BaseRepository } from './BaseRepository';
-import { UpdateError } from 'src/utils/Errors/Errors';
 
 export class TypeORMAuthRepository extends BaseRepository<AuthEntity, Auth> implements IAuthRepository {
     constructor(repository: Repository<AuthEntity>) {
@@ -13,7 +14,7 @@ export class TypeORMAuthRepository extends BaseRepository<AuthEntity, Auth> impl
     }
 
     async findByEmail(email: string): Promise<Auth | null> {
-        return this.findByProperty('email', email);
+        return await this.findByProperty('email', email);
     }
 
     async create(auth: Omit<Auth, 'id'>): Promise<{ status: number; error?: string; data?: Auth }> {
@@ -23,8 +24,10 @@ export class TypeORMAuthRepository extends BaseRepository<AuthEntity, Auth> impl
             auth.name,
             auth.password
         );
+        
+        const result = await super.create(newAuth);
 
-        return super.create(newAuth);
+        return result;
     }
 
 

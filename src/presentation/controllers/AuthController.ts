@@ -19,8 +19,8 @@ export class AuthController {
   };
 
   register = async (req: Request, res: Response) => {
-    const { email, name, password, role } = req.body;
-    const result = await this.registerUseCase.execute(email, name, password, role);
+    const { email, name, password } = req.body;
+    const result = await this.registerUseCase.execute(email, name, password);
     res.json(result);
   };
 

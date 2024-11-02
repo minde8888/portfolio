@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
+
 import { GetAllUsersUseCase } from "../../application/useCases/user/GetAllUsersUseCase";
 import { GetUserByIdUseCase } from "../../application/useCases/user/GetUserByIdUseCase";
 import { UpdateUserUseCase } from "../../application/useCases/user/UpdateUserUseCase";
 import { RemoveUserUseCase } from "../../application/useCases/user/RemoveUserUseCase";
-import { UserDTO } from "src/application/dtos/UserDTO";
+import { UpdateUserDTO } from "../../application/dtos/user/UpdateUserDTO";
 
 export class UserController {
   constructor(
@@ -46,10 +47,10 @@ export class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const updates: Partial<UserDTO> = {
+      const updates: Partial<UpdateUserDTO> = {
         email: req.body.email,
         name: req.body.name,
-        role: req.body.role,
+        password: req.body.password,
       };
 
       const updatedUser = await this.updateUserUseCase.execute(req.params.id,  updates );

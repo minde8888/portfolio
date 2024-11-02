@@ -1,6 +1,6 @@
 import { AutoMap } from '@automapper/classes';
 
-export class UserDTO {
+export class BaseUserDTO {
     @AutoMap()
     id: string;
 
@@ -10,23 +10,13 @@ export class UserDTO {
     @AutoMap()
     name: string;
 
-    @AutoMap()
-    role: string;
-
-    @AutoMap()
-    isDeleted: boolean;
-
     constructor(
         id: string,
         email: string,
-        name: string,
-        role: string,
-        isDeleted: boolean
+        name: string
     ) {
         this.id = id;
         this.email = email;
         this.name = name;
-        this.role = role;
-        this.isDeleted = isDeleted;
     }
 }

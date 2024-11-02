@@ -23,7 +23,7 @@ export class AuthEntity extends BaseEntity {
             eager: true
         }
     )
-    @JoinColumn()
+    @JoinColumn({ name: 'user_id' })
     user?: Promise<UserEntity>;
 
     private constructor() {

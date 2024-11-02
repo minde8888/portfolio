@@ -11,11 +11,11 @@ export class TypeORMUserRepository extends BaseRepository<UserEntity, User> impl
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        return this.findByProperty('email', email);
+        return await this.findByProperty('email', email);
     }
 
     async findById(id: string): Promise<User | null> {
-        return this.findByProperty('id', id);
+        return await this.findByProperty('id', id);
     }
 
     async create(user: User): Promise<{ status: number; error?: string }> {
@@ -23,8 +23,9 @@ export class TypeORMUserRepository extends BaseRepository<UserEntity, User> impl
         if (existingUser) {
             throw new EmailAlreadyExistsError();
         }
-        return super.create(user);
+        return await super.create(user);
     }
+    
 
     protected async  toDomain(entity: UserEntity): Promise<User> {
         return entity.toDomain();

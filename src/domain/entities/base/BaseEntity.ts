@@ -18,7 +18,5 @@ export abstract class BaseEntity {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-  
+    }  
 }

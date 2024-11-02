@@ -6,7 +6,7 @@ import { User } from '../../../domain/entities/user/User';
 
 import { cleanDTO } from '../../../application/utils/cleanDTO';
 
-import { UserDTO } from '../../dtos/UserDTO';
+import { UserDTO } from '../../dtos/user/UserDTO';
 
 import { ForbiddenError, NotFoundError } from '../../../utils/Errors/Errors';
 
@@ -18,19 +18,23 @@ export class LoginUseCase {
   ) { }
 
   async execute(email: string, password: string): Promise<{ token: { accessToken: string; refreshToken: string }; user: UserDTO }> {
-    const auth = await this.authService.validateUser(email, password);
-    if (!auth) throw new ForbiddenError('Invalid email or password');
+    try {
+      const auth = await this.authService.validateUser(email, password);
+      if (!auth) throw new ForbiddenError('Invalid email or password');
 
-    const user = await this.userRepository.findById(auth.id);
-    if (!user) throw new NotFoundError('User not found');
+      const user = await this.userRepository.findById(auth.id);
+      if (!user) throw new NotFoundError('User not found');
 
-    const accessToken = this.authService.generateAccessToken(user);
-    const refreshToken = this.authService.generateRefreshToken(user);
-    await this.updateUserRefreshToken(user, refreshToken);
+      const accessToken = this.authService.generateAccessToken(user);
+      const refreshToken = this.authService.generateRefreshToken(user);
+      await this.updateUserRefreshToken(user, refreshToken);
 
-    const userDTO = this.mapAndCleanUser(user);
+      const userDTO = this.mapAndCleanUser(user);
 
-    return { token: { accessToken, refreshToken }, user: userDTO };
+      return { token: { accessToken, refreshToken }, user: userDTO };
+    } catch (error) {
+      throw error;
+    }
   }
 
   private mapAndCleanUser(user: User): UserDTO {

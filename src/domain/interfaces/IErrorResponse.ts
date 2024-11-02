@@ -9,3 +9,8 @@ export interface IErrorResponse {
 export interface IAppError extends Error {
   statusCode?: number;
 }
+
+export interface ICustomError extends Error {
+  statusCode?: number;
+  status?: string;
+}

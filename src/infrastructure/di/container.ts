@@ -47,7 +47,7 @@ export async function container(): Promise<IContainerResult> {
   configureUserMapper(mapper);
 
   // User Use Cases
-  const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
+  const getAllUsersUseCase = new GetAllUsersUseCase(userRepository, mapper);
   const getUserByIdUseCase = new GetUserByIdUseCase(userRepository, cacheService, mapper);
   const updateUserUseCase = new UpdateUserUseCase(userRepository, authRepository, mapper);
   const removeUserUseCase = new RemoveUserUseCase(userRepository);

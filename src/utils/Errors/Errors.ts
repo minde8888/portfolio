@@ -55,17 +55,23 @@ export class ForbiddenError extends AppError {
   }
 }
 
-export class DatabaseError extends Error {
+export class DatabaseError extends AppError {
   constructor(message: string, public readonly originalError: Error) {
     super(message);
     this.name = 'DatabaseError';
   }
 }
 
-export class UpdateError extends Error {
+export class UpdateError extends AppError {
   constructor(message: string) {
     super(message);
     this.name = 'UpdateError';
   }
 }
 
+export class MapperError extends AppError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'UpdateError';
+  }
+}

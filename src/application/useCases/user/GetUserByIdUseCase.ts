@@ -1,11 +1,13 @@
 import { validate as uuidValidate } from 'uuid';
 import { Mapper } from '@automapper/core';
 
-import { NotFoundError, ValidationError } from "../../../utils/Errors/Errors";
 import { User } from "../../../domain/entities/user/User";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { ICacheService } from "../../../domain/services/ICacheService";
-import { UserDTO } from '../../../application/dtos/UserDTO';
+
+import { UserDTO } from '../../dtos/user/UserDTO';
+
+import { NotFoundError, ValidationError } from "../../../utils/Errors/Errors";
 
 export class GetUserByIdUseCase {
   constructor(
@@ -14,29 +16,34 @@ export class GetUserByIdUseCase {
     private mapper: Mapper
   ) { }
 
-  async execute(id: string): Promise<User> {
-
+  async execute(id: string): Promise<UserDTO> {
     if (!uuidValidate(id)) {
       throw new ValidationError("Invalid user ID");
     }
-    
-    const cacheKey = `user:${id}`;
-    const cachedUser = await this.cacheService.get(cacheKey);
 
-    if (cachedUser) {
-      return JSON.parse(cachedUser);
+    try {
+
+      const cacheKey = `user:${id}`;
+      const cachedUser = await this.cacheService.get(cacheKey);
+
+      if (cachedUser) {
+        return JSON.parse(cachedUser);
+      }
+
+      const user = await this.userRepository.findById(id);
+
+      if (!user) {
+        throw new NotFoundError("User dose not exist");
+      }
+
+      const userDTO = this.mapper.map(user, User, UserDTO);
+
+      await this.cacheService.set(cacheKey, JSON.stringify(userDTO), 3600);
+
+      return userDTO;
+
+    } catch (error) {
+      throw error;
     }
-
-    const user = await this.userRepository.findById(id);
-    
-    if (!user) {
-      throw new NotFoundError("User dose not exist");
-    }
-
-    const userDTO = this.mapper.map(user, UserDTO, User);
-
-    await this.cacheService.set(cacheKey, JSON.stringify(userDTO), 3600);
-
-    return userDTO;
   }
 }
