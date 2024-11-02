@@ -1,65 +1,38 @@
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { HttpStatus } from '@nestjs/common';
-
 import { IAuthRepository } from '../../domain/repositories/IAuthRepository';
 import { Auth } from '../../domain/entities/auth/Auth';
-
 import { AuthEntity } from '../entities/AuthEntity';
+import { BaseRepository } from './BaseRepository';
+import { UpdateError } from 'src/utils/Errors/Errors';
 
-import { UpdateError } from '../../utils/Errors/Errors';
-
-export class TypeORMAuthRepository implements IAuthRepository {
-    constructor(private repository: Repository<AuthEntity>) { }
+export class TypeORMAuthRepository extends BaseRepository<AuthEntity, Auth> implements IAuthRepository {
+    constructor(repository: Repository<AuthEntity>) {
+        super(repository);
+    }
 
     async findByEmail(email: string): Promise<Auth | null> {
-        try {
-            const user = await this.repository.findOne({ where: { email } });
-            return user ? user.toDomain() : null;
-        } catch (error) {
-            throw error;
-        }
+        return this.findByProperty('email', email);
     }
 
-    async create(auth: Omit<Auth, 'id'>): Promise<{ status: number; error?: string; auth: Auth }> {
-        try {
-            const entity = AuthEntity.fromDomain(
-                new Auth(uuidv4(), auth.email, auth.name, auth.password)
-            );
-            entity.updatedAt = new Date();
-            const savedEntity = await this.repository.save(entity);
+    async create(auth: Omit<Auth, 'id'>): Promise<{ status: number; error?: string; data?: Auth }> {
+        const newAuth = new Auth(
+            uuidv4(),
+            auth.email,
+            auth.name,
+            auth.password
+        );
 
-            return {
-                status: HttpStatus.CREATED,
-                auth: await savedEntity.toDomain()
-            };
-        } catch (error) {
-            console.error('Error creating auth:', error);
-            throw error;
-        }
+        return super.create(newAuth);
     }
 
-    async update(id: string, authData: Partial<Auth>): Promise<Auth> {
-        const entityData = this.convertToEntityPartial(authData);
-        entityData.updatedAt = new Date();
 
-        await this.repository.update(id, entityData);
-        const updatedAuth = await this.repository.findOne({ where: { id } });
-
-        if (!updatedAuth) {
-            throw new UpdateError('User not found after update');
-        }
-
-        return updatedAuth.toDomain();
+    protected async toDomain(entity: AuthEntity): Promise<Auth> {
+        return entity.toDomain();
     }
 
-    private convertToEntityPartial(authData: Partial<Auth>): Partial<AuthEntity> {
-        const entityData: Partial<AuthEntity> = {};
-
-        if (authData.email) entityData.email = authData.email;
-        if (authData.name) entityData.name = authData.name;
-        if (authData.password) entityData.password = authData.password;
-
-        return entityData;
+    protected async toEntity(domain: Auth): Promise<AuthEntity> {
+        return AuthEntity.fromDomain(domain);
     }
 }

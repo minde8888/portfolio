@@ -6,36 +6,28 @@ import { IBaseRepository } from '../../domain/repositories/IRepository';
 export abstract class BaseRepository<T extends ObjectLiteral, D> implements IBaseRepository<D> {
     constructor(
         protected readonly repository: Repository<T>
-    ) {}
+    ) { }
 
     async findByProperty(property: keyof D, value: any): Promise<D | null> {
         try {
             const whereClause = { [property]: value } as FindOptionsWhere<T>;
             const entity = await this.repository.findOne({ where: whereClause });
-            return entity ? this.toDomain(entity) : null;
+            return entity ? await this.toDomain(entity) : null;
         } catch (error) {
             throw error;
         }
     }
 
-    async findById(id: string): Promise<D> {
-        const entity = await this.repository.findOne({ where: { id } as unknown as FindOptionsWhere<T> });
-        if (!entity) {
-            throw new NotFoundError(`Entity with id ${id} not found`);
-        }
-        return this.toDomain(entity);
-    }
-
     async getAll(): Promise<D[]> {
-        const entities = await this.repository.find({ 
-            where: { isDeleted: false } as unknown as FindOptionsWhere<T> 
+        const entities = await this.repository.find({
+            where: { isDeleted: false } as unknown as FindOptionsWhere<T>
         });
-        return entities.map(entity => this.toDomain(entity));
+        return Promise.all(entities.map(entity => this.toDomain(entity)));
     }
 
     async create(domain: D): Promise<{ status: number; error?: string }> {
         try {
-            const entity = this.toEntity(domain);
+            const entity = await this.toEntity(domain);
             (entity as any).createdAt = new Date();
             await this.repository.save(entity);
             return { status: HttpStatus.CREATED };
@@ -45,34 +37,37 @@ export abstract class BaseRepository<T extends ObjectLiteral, D> implements IBas
     }
 
     async update(id: string, partialDomain: Partial<D>): Promise<D> {
-        const entity = await this.repository.findOne({ 
-            where: { id } as unknown as FindOptionsWhere<T> 
-        });
-        
-        if (!entity) {
-            throw new NotFoundError(`Entity with id ${id} not found`);
-        }
-
         try {
-            const updatedEntity = {
-                ...entity,
-                ...this.toEntity(partialDomain as D),
-                updatedAt: new Date()
-            };
-            await this.repository.save(updatedEntity);
-            return this.toDomain(updatedEntity);
+            const existingEntity = await this.repository.findOne({
+                where: { id } as unknown as FindOptionsWhere<T>
+            });
+
+            if (!existingEntity) {
+                throw new NotFoundError(`Entity with id ${id} not found`);
+            }
+
+            const existingDomain = await this.toDomain(existingEntity);
+            const updatedEntity = this.repository.merge(
+                existingEntity,
+                await this.toEntity({ ...existingDomain, ...partialDomain } as D)
+            );
+
+            (updatedEntity as any).updatedAt = new Date();
+
+            const savedEntity = await this.repository.save(updatedEntity);
+            return this.toDomain(savedEntity);
         } catch (error) {
             throw error;
         }
     }
 
     async remove(id: string): Promise<{ status: number; error?: string }> {
-        const entity = await this.repository.findOne({ 
-            where: { id } as unknown as FindOptionsWhere<T> 
+        const entity = await this.repository.findOne({
+            where: { id } as unknown as FindOptionsWhere<T>
         });
 
-        if (!entity) {
-            throw new NotFoundError(`Entity with id ${id} not found`);
+        if (!entity || (entity as any).isDeleted) {
+            throw new NotFoundError(`Entity not found or has been deleted`);
         }
 
         try {
@@ -84,6 +79,6 @@ export abstract class BaseRepository<T extends ObjectLiteral, D> implements IBas
         }
     }
 
-    protected abstract toDomain(entity: T): D;
-    protected abstract toEntity(domain: D): T;
+    protected abstract toDomain(entity: T): Promise<D>;
+    protected abstract toEntity(domain: D): Promise<T>;
 }

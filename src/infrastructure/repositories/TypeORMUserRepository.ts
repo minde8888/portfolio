@@ -14,6 +14,10 @@ export class TypeORMUserRepository extends BaseRepository<UserEntity, User> impl
         return this.findByProperty('email', email);
     }
 
+    async findById(id: string): Promise<User | null> {
+        return this.findByProperty('id', id);
+    }
+
     async create(user: User): Promise<{ status: number; error?: string }> {
         const existingUser = await this.findByEmail(user.email);
         if (existingUser) {
@@ -22,11 +26,11 @@ export class TypeORMUserRepository extends BaseRepository<UserEntity, User> impl
         return super.create(user);
     }
 
-    protected toDomain(entity: UserEntity): User {
+    protected async  toDomain(entity: UserEntity): Promise<User> {
         return entity.toDomain();
     }
 
-    protected toEntity(domain: User): UserEntity {
+    protected async  toEntity(domain: User): Promise<UserEntity> {
         return UserEntity.fromDomain(domain);
     }
 }

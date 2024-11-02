@@ -3,6 +3,7 @@ import { GetAllUsersUseCase } from "../../application/useCases/user/GetAllUsersU
 import { GetUserByIdUseCase } from "../../application/useCases/user/GetUserByIdUseCase";
 import { UpdateUserUseCase } from "../../application/useCases/user/UpdateUserUseCase";
 import { RemoveUserUseCase } from "../../application/useCases/user/RemoveUserUseCase";
+import { UserDTO } from "src/application/dtos/UserDTO";
 
 export class UserController {
   constructor(
@@ -10,7 +11,7 @@ export class UserController {
     private readonly getUserByIdUseCase: GetUserByIdUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly removeUserUseCase: RemoveUserUseCase
-  ) {}
+  ) { }
 
   getAllUsers = async (
     req: Request,
@@ -45,13 +46,14 @@ export class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const updates: Partial<UserDTO> = {
+        email: req.body.email,
+        name: req.body.name,
+        role: req.body.role,
+      };
 
-      const { email, name } = req.body;
-
-      const updatedUser = await this.updateUserUseCase.execute(req.params.id, {
-        email,
-        name,
-      });
+      const updatedUser = await this.updateUserUseCase.execute(req.params.id,  updates );
+      
       res.status(200).json(updatedUser);
     } catch (error) {
       next(error);
