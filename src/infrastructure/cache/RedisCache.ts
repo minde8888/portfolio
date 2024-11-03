@@ -1,6 +1,9 @@
 import { createClient, RedisClientType } from 'redis';
+
 import { ICacheService } from '../../domain/services/ICacheService';
+
 import { RedisError } from '../../utils/Errors/Errors';
+
 import dotenv from 'dotenv';
 
 dotenv.config();

@@ -1,5 +1,7 @@
 import { AppDataSource } from "../../database/config/AppDataSource";
+
 import fs from 'fs';
+
 import path from 'path';
 
 export class FixMigrationsCommand {

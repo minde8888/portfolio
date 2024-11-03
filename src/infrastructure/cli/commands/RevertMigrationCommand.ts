@@ -1,4 +1,5 @@
 import { AppDataSource } from "../../database/config/AppDataSource";
+
 import { MigrationService } from "../../services/MigrationService";
 
 export class RevertMigrationCommand {

@@ -8,9 +8,6 @@ import { asyncHandler } from "../../infrastructure/utils/asyncHandler";
 import { loginSchema, registerSchema } from "../validation/validateRequest";
 import { isDeletedMiddleware } from "../middlewares/deletedEntityMiddleware";
 
-
-
-
 export default async (router: Router): Promise<void> => {
   const { authController }: IContainerResult = await container();
   const validateBody = (schema: any) => expressYupMiddleware({

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+
 import { IAppError } from "../../domain/interfaces/IErrorResponse";
 
 export function errorMiddleware(
@@ -25,7 +26,6 @@ export function errorMiddleware(
     console.error(`Stack Trace:\n${err.stack}`);
   }
 
-  // Enhanced error type handling
   switch (err.name) {
     case "ValidationError":
       errorResponse.statusCode = 400;

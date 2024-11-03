@@ -15,10 +15,8 @@ async function syncMigrations() {
     try {
         await queryRunner.startTransaction();
 
-        // Clear existing migrations
         await queryRunner.query('DELETE FROM migrations');
 
-        // Insert migrations based on files
         for (const file of files) {
             const [timestamp, name] = file.split('-');
             await queryRunner.query(

@@ -1,6 +1,9 @@
 import { AutoMap } from '@automapper/classes';
+
 import { BaseEntity } from '../base/BaseEntity';
+
 import { IDeletableEntity } from '../../../domain/interfaces/IDeletableEntity';
+
 import { UserRole } from './UserRole';
 
 export class User extends BaseEntity implements IDeletableEntity {

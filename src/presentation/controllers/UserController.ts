@@ -6,6 +6,10 @@ import { UpdateUserUseCase } from "../../application/useCases/user/UpdateUserUse
 import { RemoveUserUseCase } from "../../application/useCases/user/RemoveUserUseCase";
 import { UpdateUserDTO } from "../../application/dtos/user/UpdateUserDTO";
 
+import { IGetUserByIdRequest } from "../../domain/entities/user/IGetUserByIdRequest";
+import { IUpdateUserRequest } from "../../domain/entities/user/IUpdateUserRequest";
+import { IRemoveUserRequest } from "../../domain/entities/user/IRemoveUserRequest";
+
 export class UserController {
   constructor(
     private readonly getAllUsersUseCase: GetAllUsersUseCase,
@@ -28,7 +32,7 @@ export class UserController {
   };
 
   getUserById = async (
-    req: Request,
+    req: Request & IGetUserByIdRequest,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
@@ -42,7 +46,7 @@ export class UserController {
   };
 
   updateUser = async (
-    req: Request,
+    req: Request & IUpdateUserRequest,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
@@ -62,7 +66,7 @@ export class UserController {
   };
 
   removeUser = async (
-    req: Request,
+    req: Request & IRemoveUserRequest,
     res: Response,
     next: NextFunction
   ): Promise<void> => {

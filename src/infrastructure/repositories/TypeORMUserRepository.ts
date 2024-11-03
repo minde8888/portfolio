@@ -1,8 +1,12 @@
 import { Repository } from "typeorm";
+
 import { User } from "../../domain/entities/user/User";
-import { UserEntity } from "../entities/UserEntity";
-import { BaseRepository } from "./BaseRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
+
+import { UserEntity } from "../entities/UserEntity";
+
+import { BaseRepository } from "./BaseRepository";
+
 import { EmailAlreadyExistsError } from "../../utils/Errors/Errors";
 
 export class TypeORMUserRepository extends BaseRepository<UserEntity, User> implements IUserRepository {

@@ -8,7 +8,6 @@ import authRoutes from "./presentation/routes/authRoutes";
 
 import { isDeletedMiddleware } from "./presentation/middlewares/deletedEntityMiddleware";
 import { errorMiddleware } from "./presentation/middlewares/errorMiddleware";
-import { IAppError } from "./domain/interfaces/IErrorResponse";
 
 async function bootstrap() {
   const app = express();

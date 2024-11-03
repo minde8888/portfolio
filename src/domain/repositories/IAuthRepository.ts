@@ -1,4 +1,5 @@
 import { Auth } from "../entities/auth/Auth";
+
 import { IBaseRepository } from "./IRepository";
 
 export interface IAuthRepository extends IBaseRepository<Auth> {

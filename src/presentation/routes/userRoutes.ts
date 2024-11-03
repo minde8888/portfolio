@@ -1,10 +1,13 @@
 import { Router } from "express";
 import { expressYupMiddleware } from 'express-yup-middleware';
+
 import { container } from "../../infrastructure/di/container";
-import { userSchema, userUpdateSchema } from "../validation/validateRequest";
+import { IContainerResult } from "../../infrastructure/interfaces/IContainerResult";
+
+import { userUpdateSchema } from "../validation/validateRequest";
+
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { roleMiddleware } from "../middlewares/roleMiddleware";
-import { IContainerResult } from "../../infrastructure/interfaces/IContainerResult";
 import { isDeletedMiddleware } from "../middlewares/deletedEntityMiddleware";
 
 export default async (router: Router): Promise<void> => {

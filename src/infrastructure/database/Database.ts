@@ -1,8 +1,11 @@
 import "reflect-metadata";
 import "dotenv/config";
 import { DataSource } from 'typeorm';
+
 import { IDatabase } from "../interfaces/IDatabase";
+
 import { createDatabaseIfNotExists } from "./utils/createDatabase";
+
 import { AppDataSource } from "./config/AppDataSource";
 
 export class Database implements IDatabase {

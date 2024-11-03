@@ -1,4 +1,5 @@
 import { MigrationExecutor } from "typeorm/migration/MigrationExecutor";
+
 import { AppDataSource } from "../../database/config/AppDataSource";
 
 export class RunMigrationsForceCommand {

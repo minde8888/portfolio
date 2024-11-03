@@ -1,6 +1,8 @@
 import { Repository, FindOptionsWhere, ObjectLiteral } from 'typeorm';
 import { HttpStatus } from '@nestjs/common';
+
 import { NotFoundError } from '../../utils/Errors/Errors';
+
 import { IBaseRepository } from '../../domain/repositories/IRepository';
 
 export abstract class BaseRepository<T extends ObjectLiteral, D> implements IBaseRepository<D> {

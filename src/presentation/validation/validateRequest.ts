@@ -1,13 +1,5 @@
 import * as Yup from "yup";
 
-export const userSchema = Yup.object({
-  body: Yup.object({
-    email: Yup.string().email().required(),
-    password: Yup.string().min(6).required(),
-    name: Yup.string().required(),
-  }),
-});
-
 export const userUpdateSchema = Yup.object({
   params: Yup.object({
     id: Yup.string()

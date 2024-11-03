@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+
 import { IDecodedToken } from '../../infrastructure/interfaces/IDecodedToken';
 
 export const roleMiddleware = (roles: string[]) => {

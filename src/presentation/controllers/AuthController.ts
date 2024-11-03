@@ -1,9 +1,14 @@
 import { Request, Response } from "express";
+
 import { LoginUseCase } from './../../application/useCases/auth/LoginUseCase';
 import { RefreshTokenUseCase } from '../../application/useCases/auth/RefreshTokenUseCase';
 import { RegisterUseCase } from "../../application/useCases/auth/RegisterUseCase";
-import { Login } from "../../domain/entities/auth/Login";
+
 import { IDecodedToken } from "../../infrastructure/interfaces/IDecodedToken";
+
+import { IRegisterRequest } from "../../domain/entities/auth/IRegisterRequest";
+import { ILoginRequest } from "../../domain/entities/auth/ILoginRequest";
+import { IRefreshTokenRequest } from "../../domain/entities/auth/IRefreshTokenRequest";
 
 export class AuthController {
   constructor(
@@ -13,19 +18,19 @@ export class AuthController {
   ) { }
 
   login = async (req: Request, res: Response) => {
-    const { email, password }: Login = req.body;
+    const { email, password }:ILoginRequest = req.body;
     const result = await this.loginUseCase.execute(email, password);
     res.json(result);
   };
 
   register = async (req: Request, res: Response) => {
-    const { email, name, password } = req.body;
+    const { email, name, password }:IRegisterRequest = req.body;
     const result = await this.registerUseCase.execute(email, name, password);
     res.json(result);
   };
 
   refreshToken = async (req: Request, res: Response) => {
-    const { refreshToken } = req.body;
+    const { refreshToken }:IRefreshTokenRequest = req.body;
     const result = await this.refreshTokenUseCase.execute(refreshToken);
     res.json(result);
   };

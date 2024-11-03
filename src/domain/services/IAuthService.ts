@@ -1,4 +1,4 @@
-import { IDecodedToken } from "src/infrastructure/interfaces/IDecodedToken";
+import { IDecodedToken } from "../../infrastructure/interfaces/IDecodedToken";
 import { Auth } from "../entities/auth/Auth";
 import { User } from "../entities/user/User";
 

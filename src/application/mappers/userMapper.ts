@@ -1,8 +1,11 @@
 import { Mapper, createMap, forMember, mapFrom } from '@automapper/core';
+
 import { UserDTO } from '../dtos/user/UserDTO';
+import { UpdateUserDTO } from '../dtos/user/UpdateUserDTO';
+
 import { Auth } from '../../domain/entities/auth/Auth';
 import { User } from '../../domain/entities/user/User';
-import { UpdateUserDTO } from '../dtos/user/UpdateUserDTO';
+
 import { UserRole } from '../../domain/entities/user/UserRole';
 
 export function configureUserMapper(mapper: Mapper) {
