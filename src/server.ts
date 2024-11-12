@@ -40,7 +40,7 @@ async function bootstrap() {
 
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));
-
+ 
 
   try {
     await database.connect();

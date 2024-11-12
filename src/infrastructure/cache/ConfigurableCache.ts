@@ -1,10 +1,11 @@
 import { ICacheService } from "../../domain/services/ICacheService";
 
 import dotenv from "dotenv";
+import path from 'path';
 
 import { RedisCache } from './RedisCache';
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 export class  ConfigurableCache implements ICacheService {
   private cacheService: ICacheService | null;

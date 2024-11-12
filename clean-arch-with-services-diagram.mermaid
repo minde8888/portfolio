@@ -1,0 +1,49 @@
+graph TD
+    subgraph "Presentation Layer"
+        A[Controllers]
+        M[Middlewares]
+    end
+    
+    subgraph "Application Layer"
+        B[Use Cases]
+        C[Services]
+        D[DTOs]
+    end
+    
+    subgraph "Domain Layer"
+        E[Entities]
+        F[Value Objects]
+        G[Domain Events]
+        H[Domain Services]
+        I[Repository Interfaces]
+    end
+    
+    subgraph "Infrastructure Layer"
+        J[Repositories Impl]
+        K[External Services]
+        L[Database]
+    end
+    
+    A -->|uses| B
+    B -->|uses| C
+    C -->|uses| E
+    C -->|uses| F
+    C -->|uses| H
+    C -->|uses| I
+    H -->|uses| E
+    J -->|implements| I
+    J -->|uses| L
+    K -->|external| C
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#bbf,stroke:#333,stroke-width:2px
+    style C fill:#bbf,stroke:#333,stroke-width:2px
+    style D fill:#bbf,stroke:#333,stroke-width:2px
+    style E fill:#bfb,stroke:#333,stroke-width:2px
+    style F fill:#bfb,stroke:#333,stroke-width:2px
+    style G fill:#bfb,stroke:#333,stroke-width:2px
+    style H fill:#bfb,stroke:#333,stroke-width:2px
+    style I fill:#bfb,stroke:#333,stroke-width:2px
+    style J fill:#fbb,stroke:#333,stroke-width:2px
+    style K fill:#fbb,stroke:#333,stroke-width:2px
+    style L fill:#fbb,stroke:#333,stroke-width:2px
