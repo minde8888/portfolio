@@ -1,22 +1,37 @@
-/dist
-.env
-/uploads
+# Ignore node_modules and environment files
 /node_modules
-yarn-error.log
+.env
 
-!src/**
-
+# TypeScript and build configuration
+tsconfig.json
+tsup.config.ts
 ./tsconfig.tsbuildinfo
-package-lock.json
-build
+
+# Ignore build and cache directories
+/dist
+/build
 .cache
 
+# Ignore specific log files
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Ignore generated directories and data
+/uploads
+.mermaid
+
+# Allow only specific subdirectories in the Yarn folder
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-yarn.lock
 
+# Allow source files (main application code)
+!src/**
+
+# Ignore API testing files
 request.http
+.npmignore
