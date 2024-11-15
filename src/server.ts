@@ -1,20 +1,41 @@
 import express, { Application, Router } from "express";
+
 import { Database } from "./infrastructure/database/Database";
+
 import userRoutes from "./presentation/routes/userRoutes";
 import authRoutes from "./presentation/routes/authRoutes";
+
 import { isDeletedMiddleware } from "./presentation/middlewares/deletedEntityMiddleware";
 import { errorMiddleware } from "./presentation/middlewares/errorMiddleware";
+
 import { IServerConfig } from "./types/ServerConfig";
+import { IRedis } from "./types/RedisConfig";
+import { IJwtConfig } from "./infrastructure/types";
 
 export class Server {
     private app: Application;
     private database: Database;
+    private readonly defaultRedisConfig: IRedis = {
+        redisOn: false,
+        url: 'redis://localhost:6379'
+    };
+    private readonly defaultServerConfig: IServerConfig = {
+        port: 3000,
+        apiPrefix: '/v1/api'
+    };
 
-    constructor(private config: IServerConfig = {}) {
+    constructor(
+        private readonly config: IServerConfig = {},
+        private readonly redisConfig: IRedis = {},
+        private readonly tokenConfig?: Partial<IJwtConfig>
+    ) {
         this.app = express();
         this.database = Database.getInstance(config);
         this.setupMiddlewares();
         this.setupRoutes();
+        this.redisConfig = { ...this.defaultRedisConfig, ...redisConfig };
+        this.config = { ...this.defaultServerConfig, ...config };
+        this.tokenConfig;
     }
 
     private setupMiddlewares(): void {
@@ -22,18 +43,32 @@ export class Server {
         this.app.use(isDeletedMiddleware);
     }
 
-    private async setupRoutes(): Promise<void> {
+    private async setupRoutes(tokenConfig?: Partial<IJwtConfig>,): Promise<void> {
+
+        const redisOn = this.redisConfig.redisOn ?? false;
+        const url = this.redisConfig.url ?? 'redis://localhost:6379';
+
         const router = Router();
-        await userRoutes(router);
-        await authRoutes(router);
-        this.app.use(this.config.apiPrefix || "/api", router);
+
+        await Promise.all([
+            userRoutes(router, tokenConfig, redisOn, url),
+            authRoutes(router, tokenConfig)
+        ]);
+
+        this.app.use(this.config.apiPrefix || "/v1/api/", router);
         this.app.use(errorMiddleware);
     }
 
     async start(): Promise<void> {
-        await this.database.connect();
-        const port = this.config.port || 3000;
-        this.app.listen(port, () => console.log(`Server listening on port ${port}`));
+        try {
+            await this.database.connect();
+            this.app.listen(this.config.port, () => {
+                console.log(`Server running on port ${this.config.port}`);
+            });
+        } catch (error) {
+            console.error('Failed to start server:', error);
+            throw error;
+        }
     }
 
     async shutdown(): Promise<void> {

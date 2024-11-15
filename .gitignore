@@ -9,8 +9,8 @@ tsup.config.ts
 .tsup.config.ts
 
 # Ignore build and cache directories
-/dist
-/build
+dist/
+build/
 .cache
 
 # Ignore specific log files

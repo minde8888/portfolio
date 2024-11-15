@@ -3,6 +3,7 @@ import { expressYupMiddleware } from 'express-yup-middleware';
 
 import { container } from "../../infrastructure/di/container";
 import { IContainerResult } from "../../infrastructure/interfaces/IContainerResult";
+import { IJwtConfig } from "../../infrastructure/types";
 
 import { userUpdateSchema } from "../validation/validateRequest";
 
@@ -10,8 +11,8 @@ import { authMiddleware } from "../middlewares/authMiddleware";
 import { roleMiddleware } from "../middlewares/roleMiddleware";
 import { isDeletedMiddleware } from "../middlewares/deletedEntityMiddleware";
 
-export default async (router: Router): Promise<void> => {
-  const { userController }: IContainerResult = await container();
+export default async (router: Router, config?: Partial<IJwtConfig>, use_redis?: boolean, redis_url?: string): Promise<void> => {
+  const { userController }: IContainerResult = await container(config, use_redis, redis_url);
 
   const validateBody = (schema: any) => expressYupMiddleware({
     schemaValidator: {
@@ -19,27 +20,27 @@ export default async (router: Router): Promise<void> => {
     },
   });
 
-  router.get("/v1/users", 
-    authMiddleware, 
-    isDeletedMiddleware, 
-    roleMiddleware(['user','admin']), 
+  router.get("users",
+    authMiddleware,
+    isDeletedMiddleware,
+    roleMiddleware(['user', 'admin']),
     userController.getAllUsers);
 
-  router.get("/v1/users/:id", 
-    isDeletedMiddleware, 
-    authMiddleware, 
-    roleMiddleware(['user']), 
+  router.get("users/:id",
+    isDeletedMiddleware,
+    authMiddleware,
+    roleMiddleware(['user']),
     userController.getUserById);
 
   router.put(
-    "/v1/users/:id",
+    "users/:id",
     authMiddleware,
     roleMiddleware(['user', 'admin']),
     validateBody(userUpdateSchema),
     userController.updateUser
   );
 
-  router.delete("/v1/users/:id",
+  router.delete("users/:id",
     authMiddleware,
     roleMiddleware(['user', 'admin']),
     userController.removeUser);

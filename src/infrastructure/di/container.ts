@@ -20,9 +20,14 @@ import { AuthController } from '../..//presentation/controllers/AuthController';
 import { IAuthService } from '../../domain/services/IAuthService';
 import { RefreshTokenUseCase } from '../../application/useCases/auth/RefreshTokenUseCase';
 import { IContainerResult } from '../interfaces/IContainerResult';
+import { IJwtConfig } from '../types';
 
 
-export async function container(): Promise<IContainerResult> {
+export async function container(
+  config?: Partial<IJwtConfig>,
+  use_redis?: boolean,
+  redis_url?: string
+): Promise<IContainerResult> {
   const database = Database.getInstance();
   await database.connect();
 
@@ -37,8 +42,8 @@ export async function container(): Promise<IContainerResult> {
   );
 
   // Services
-  const cacheService: ICacheService = new ConfigurableCache();
-  const authService: IAuthService = new JwtAuthService(authRepository);
+  const cacheService: ICacheService = new ConfigurableCache(use_redis, redis_url);
+  const authService: IAuthService = new JwtAuthService(authRepository, config);
 
   // Configure AutoMapper
   const mapper = createMapper({

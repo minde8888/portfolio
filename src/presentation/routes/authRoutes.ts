@@ -7,9 +7,10 @@ import { asyncHandler } from "../../infrastructure/utils/asyncHandler";
 
 import { loginSchema, registerSchema } from "../validation/validateRequest";
 import { isDeletedMiddleware } from "../middlewares/deletedEntityMiddleware";
+import { IJwtConfig } from "src/infrastructure/types";
 
-export default async (router: Router): Promise<void> => {
-  const { authController }: IContainerResult = await container();
+export default async (router: Router, config?: Partial<IJwtConfig>): Promise<void> => {
+  const { authController }: IContainerResult = await container(config);
   const validateBody = (schema: any) => expressYupMiddleware({
     schemaValidator: {
       schema: schema
@@ -17,17 +18,17 @@ export default async (router: Router): Promise<void> => {
   });
 
   router.post(
-    "/v1/login",
+    "login",
     validateBody(loginSchema),
     isDeletedMiddleware, 
     asyncHandler(authController.login)
   );
 
   router.post(
-    "/v1/register",
+    "register",
     validateBody(registerSchema),
     asyncHandler(authController.register)
   );
 
-  router.post("/v1/refresh-token", asyncHandler(authController.refreshToken));
+  router.post("refresh-token", asyncHandler(authController.refreshToken));
 };

@@ -1,18 +1,13 @@
 import { ICacheService } from "../../domain/services/ICacheService";
 
-import dotenv from "dotenv";
-import path from 'path';
-
 import { RedisCache } from './RedisCache';
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-
-export class  ConfigurableCache implements ICacheService {
+export class ConfigurableCache implements ICacheService {
   private cacheService: ICacheService | null;
 
-  constructor() {
+  constructor(use_redis?: boolean, redis_url?: string) {
     this.cacheService =
-      process.env.USE_REDIS === "true" ? new RedisCache() : null;
+      use_redis ? new RedisCache(redis_url) : null;
   }
 
   async get(key: string): Promise<string | null> {

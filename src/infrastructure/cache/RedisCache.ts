@@ -4,19 +4,15 @@ import { ICacheService } from '../../domain/services/ICacheService';
 
 import { RedisError } from '../../utils/Errors/Errors';
 
-import dotenv from 'dotenv';
-
-dotenv.config();
-
 export class RedisCache implements ICacheService {
   private client: RedisClientType;
   private isConnected: boolean = false;
 
-  constructor() {
-    console.log(`Redis URL: ${process.env.REDIS_URL || 'redis://localhost:6379'}`);
+  constructor(redis_url?: string) {
+    console.log(`Redis URL: ${redis_url}`);
 
     this.client = createClient({
-      url: process.env.REDIS_URL || 'redis://localhost:6379',
+      url: redis_url,
       socket: {
         reconnectStrategy: (retries) => {
           console.log(`Reconnection attempt ${retries}`);
@@ -24,7 +20,7 @@ export class RedisCache implements ICacheService {
             console.error('Max reconnection attempts reached. Stopping reconnection.');
             return new Error('Max reconnection attempts reached');
           }
-          return Math.min(retries * 100, 3000);
+          return Math.min(retries * 100, 3000); 
         }
       }
     });
