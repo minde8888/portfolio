@@ -1,13 +1,19 @@
 {
   "name": "cca_auth",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "repository": {
     "url": "https://github.com/minde8888/protfolio"
   },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
+    "prepublishOnly": "npm run build",
     "build": "tsup",
     "start": "ts-node ./src/server.ts",
     "dev": "nodemon ./src/server.ts",

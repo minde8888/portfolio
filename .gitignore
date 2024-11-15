@@ -36,3 +36,10 @@ yarn.lock
 # Ignore API testing files
 request.http
 .npmignore
+
+# NPM package files
+*.tgz
+
+# Generated index file
+src/index.ts
+index.ts
