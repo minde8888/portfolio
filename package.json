@@ -1,9 +1,9 @@
 {
   "name": "cca_auth",
-  "version": "1.1.1",
+  "version": "0.0.4",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "repository": {
     "url": "https://github.com/minde8888/protfolio"
   },
@@ -12,11 +12,19 @@
     "LICENSE",
     "README.md"
   ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
-    "prepublishOnly": "npm run build",
-    "build": "tsup",
-    "start": "ts-node ./src/server.ts",
-    "dev": "nodemon ./src/server.ts",
+    "clean:dist": "npx rimraf dist",
+    "clean": "rimraf dist node_modules package-lock.json",
+    "build": "node build.mjs",
+    "rebuild": "npm run clean && npm install && npm run build",
+    "start": "ts-node -r tsconfig-paths/register src/server.ts",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "ts-node src/infrastructure/database/scripts/generateMigration.ts",
     "migration:run": "ts-node src/infrastructure/cli/cli.ts run-migrations",
@@ -26,47 +34,41 @@
     "migration:sync": "ts-node src/infrastructure/database/scripts/syncMigrations.ts",
     "migration:list": "ts-node src/infrastructure/database/scripts/listMigrations.ts"
   },
-  "keywords": [
-    "express js",
-    "backend",
-    "auth",
-    "api"
-  ],
-  "author": "Mindaugas",
-  "license": "MIT",
   "dependencies": {
     "@automapper/classes": "^8.8.1",
     "@automapper/core": "^8.8.1",
     "@nestjs/common": "^10.4.5",
     "@nestjs/platform-express": "^10.4.5",
-    "@types/jsonwebtoken": "^9.0.7",
-    "@types/uuid": "^10.0.0",
     "bcrypt": "^5.1.1",
     "express": "^4.17.1",
     "express-yup-middleware": "^1.2.4",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.0",
     "redis": "^4.7.0",
-    "reflect-metadata": "^0.2.2",
+    "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "tsup": "^8.3.5",
     "tsyringe": "^4.8.0",
     "typeorm": "^0.3.20",
-    "yarn": "^1.22.22",
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@nestjs/core": "^10.0.0",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.13",
-    "@types/node": "^16.11.12",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^16.18.119",
     "@types/pg": "^8.11.10",
+    "@types/uuid": "^10.0.0",
     "cross-env": "^7.0.3",
+    "esbuild": "^0.19.12",
     "nodemon": "^2.0.15",
-    "ts-node": "^10.4.0",
+    "rimraf": "^5.0.10",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.6.3"
   },
-  "compilerOptions": {
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+  "peerDependencies": {
+    "@nestjs/core": "^10.0.0",
+    "reflect-metadata": "^0.1.13"
   }
 }

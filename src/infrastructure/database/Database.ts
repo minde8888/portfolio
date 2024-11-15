@@ -6,20 +6,22 @@ import { IDatabase } from "../interfaces/IDatabase";
 
 import { createDatabaseIfNotExists } from "./utils/createDatabase";
 
-import { AppDataSource } from "./config/AppDataSource";
+import { createDataSource } from "./config/createDataSource";
+import { IServerConfig } from "../../types/ServerConfig";
 
 export class Database implements IDatabase {
   private static instance: Database;
   private dataSource: DataSource;
   private isConnected: boolean = false;
+  
 
-  private constructor() {
-    this.dataSource = AppDataSource;
+  private constructor(config: IServerConfig = {}) {
+    this.dataSource = createDataSource(config);
   }
 
-  public static getInstance(): Database {
+  public static getInstance(config?: IServerConfig): Database {
     if (!Database.instance) {
-      Database.instance = new Database();
+      Database.instance = new Database(config);
     }
     return Database.instance;
   }

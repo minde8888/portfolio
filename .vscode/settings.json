@@ -4,8 +4,10 @@
         "datname",
         "dtos",
         "fontcolor",
+        "metafile",
         "Mindaugas",
         "nestjs",
+        "outfile",
         "tsup",
         "tsyringe",
         "uuidv"

@@ -1,6 +1,6 @@
 import { MigrationExecutor } from "typeorm/migration/MigrationExecutor";
 
-import { AppDataSource } from "../../database/config/AppDataSource";
+import { AppDataSource } from "../../database/config/createDataSource";
 
 export class RunMigrationsForceCommand {
     static async execute(): Promise<void> {

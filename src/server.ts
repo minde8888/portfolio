@@ -1,72 +1,51 @@
-import "reflect-metadata";
-import express from "express";
-
+import express, { Application, Router } from "express";
 import { Database } from "./infrastructure/database/Database";
-
 import userRoutes from "./presentation/routes/userRoutes";
 import authRoutes from "./presentation/routes/authRoutes";
-
 import { isDeletedMiddleware } from "./presentation/middlewares/deletedEntityMiddleware";
 import { errorMiddleware } from "./presentation/middlewares/errorMiddleware";
+import { IServerConfig } from "./types/ServerConfig";
 
-export async function bootstrap() {
-  const app = express();
-  const database = Database.getInstance();
+export class Server {
+    private app: Application;
+    private database: Database;
 
-  app.use(express.json());
-
-  const router = express.Router();
-  
-  await userRoutes(router);
-  await authRoutes(router);
-
-  app.use("/api/", router);  
-  app.use(isDeletedMiddleware);
-  app.use(errorMiddleware);
-
-  const shutdown = async (signal: string) => {
-    console.log(`Received ${signal}. Shutting down gracefully...`);
-    try {
-      await database.disconnect();
-      console.log('Database disconnected successfully');
-      process.exit(0);
-    } catch (error) {
-      console.error('Error during shutdown:', error);
-      process.exit(1);
+    constructor(private config: IServerConfig = {}) {
+        this.app = express();
+        this.database = Database.getInstance(config);
+        this.setupMiddlewares();
+        this.setupRoutes();
     }
-  };
 
-  process.on('SIGTERM', () => shutdown('SIGTERM'));
-  process.on('SIGINT', () => shutdown('SIGINT'));
- 
+    private setupMiddlewares(): void {
+        this.app.use(express.json());
+        this.app.use(isDeletedMiddleware);
+    }
 
-  try {
-    await database.connect();
-    const port = process.env.PORT || 3000;
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
-  } catch (error) {
-    console.error("Failed to start the application:", error);
-    await database.disconnect();
-    process.exit(1);
-  }
+    private async setupRoutes(): Promise<void> {
+        const router = Router();
+        await userRoutes(router);
+        await authRoutes(router);
+        this.app.use(this.config.apiPrefix || "/api", router);
+        this.app.use(errorMiddleware);
+    }
+
+    async start(): Promise<void> {
+        await this.database.connect();
+        const port = this.config.port || 3000;
+        this.app.listen(port, () => console.log(`Server listening on port ${port}`));
+    }
+
+    async shutdown(): Promise<void> {
+        try {
+            await this.database.disconnect();
+            console.log("Database disconnected successfully");
+        } catch (error) {
+            console.error("Error during shutdown:", error);
+        }
+    }
+
+    getExpressApp(): Application {
+        return this.app;
+    }
 }
-
-process.on('uncaughtException', async (error) => {
-  console.error("Uncaught exception:", error);
-  await Database.getInstance().disconnect();
-  process.exit(1);
-});
-
-process.on('unhandledRejection', async (error) => {
-  console.error("Unhandled rejection:", error);
-  await Database.getInstance().disconnect();
-  process.exit(1);
-});
-
-bootstrap().catch(async (error) => {
-  console.error("Bootstrap error:", error);
-  await Database.getInstance().disconnect();
-  process.exit(1);
-});

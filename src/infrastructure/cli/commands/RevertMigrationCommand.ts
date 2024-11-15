@@ -1,4 +1,4 @@
-import { AppDataSource } from "../../database/config/AppDataSource";
+import { AppDataSource } from "../../database/config/createDataSource";
 
 import { MigrationService } from "../../services/MigrationService";
 
