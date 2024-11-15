@@ -20,7 +20,6 @@ export function errorMiddleware(
     message: err.message || 'An unexpected error occurred.',
   };
 
-  // Only include stack trace in development
   if (isDevelopment) {
     errorResponse.stack = err.stack;
     console.error(`Stack Trace:\n${err.stack}`);

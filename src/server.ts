@@ -9,7 +9,7 @@ import authRoutes from "./presentation/routes/authRoutes";
 import { isDeletedMiddleware } from "./presentation/middlewares/deletedEntityMiddleware";
 import { errorMiddleware } from "./presentation/middlewares/errorMiddleware";
 
-async function bootstrap() {
+export async function bootstrap() {
   const app = express();
   const database = Database.getInstance();
 
@@ -17,7 +17,6 @@ async function bootstrap() {
 
   const router = express.Router();
   
-  // Setup routes
   await userRoutes(router);
   await authRoutes(router);
 
@@ -25,7 +24,6 @@ async function bootstrap() {
   app.use(isDeletedMiddleware);
   app.use(errorMiddleware);
 
-  // Graceful shutdown handling
   const shutdown = async (signal: string) => {
     console.log(`Received ${signal}. Shutting down gracefully...`);
     try {
@@ -55,7 +53,6 @@ async function bootstrap() {
   }
 }
 
-// Handle uncaught errors
 process.on('uncaughtException', async (error) => {
   console.error("Uncaught exception:", error);
   await Database.getInstance().disconnect();

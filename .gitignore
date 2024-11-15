@@ -6,6 +6,7 @@
 tsconfig.json
 tsup.config.ts
 ./tsconfig.tsbuildinfo
+.tsup.config.ts
 
 # Ignore build and cache directories
 /dist
