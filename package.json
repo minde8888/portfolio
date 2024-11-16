@@ -1,6 +1,6 @@
 {
   "name": "cca_auth",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Clean Architecture Authentication module with TypeORM and JWT support",
   "author": "Mindaugas Baltrunas",
   "license": "MIT",
