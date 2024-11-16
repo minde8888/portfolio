@@ -24,6 +24,30 @@ const getCommonConfig = (plugins) => ({
     sourcemap: true,
     metafile: true,
     treeShaking: true,
+    // Svarbu: išlaikyti dekoratorių metaduomenis
+    keepNames: true,
+    loader: {
+        '.ts': 'ts'
+    },
+    // Įjungti eksperimentinių dekoratorių palaikymą
+    define: {
+        'process.env.NODE_ENV': '"production"',
+        'Reflect.metadata': 'Reflect.metadata',
+    },
+    banner: {
+        js: `
+            import { createRequire } from 'module';
+            import path from 'path';
+            import { fileURLToPath } from 'url';
+            import { dirname } from 'path';
+            
+            const require = createRequire(import.meta.url);
+            const __filename = fileURLToPath(import.meta.url);
+            const __dirname = dirname(__filename);
+            
+            import "reflect-metadata";
+        `,
+    },
     external: [
         '@nestjs/*',
         'typeorm',
@@ -36,9 +60,6 @@ const getCommonConfig = (plugins) => ({
         '@automapper/*',
         'tsyringe',
     ],
-    define: {
-        'process.env.NODE_ENV': '"production"',
-    },
     plugins,
 });
 
@@ -78,14 +99,25 @@ async function createBuild(format, outfile) {
 
 // Main build process
 async function runBuild() {
+    console.log('Starting build process...');
+    
+    // First ensure TypeScript compilation is clean
+    try {
+        await execAsync('tsc --noEmit');
+        console.log('TypeScript compilation check passed.');
+    } catch (error) {
+        console.error('TypeScript compilation check failed:', error);
+        process.exit(1);
+    }
+    
     await generateTypeDeclarations();
-
+    
     // Build for CommonJS
     await createBuild('cjs', 'dist/index.js');
-
+    
     // Build for ESM
     await createBuild('esm', 'dist/index.mjs');
-
+    
     console.log('All builds completed successfully!');
 }
 
