@@ -1,8 +1,47 @@
 {
   "name": "cca_auth",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Clean Architecture Authentication module with TypeORM and JWT support",
-  "private": true,
+  "author": "Mindaugas Baltrunas",
+  "license": "MIT",
+  "keywords": [
+    "authentication",
+    "clean-architecture",
+    "express",
+    "typescript",
+    "jwt",
+    "typeorm",
+    "nestjs"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/minde8888/protfolio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/minde8888/protfolio/issues"
+  },
+  "homepage": "https://github.com/minde8888/protfolio#readme",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "clean:dist": "npx rimraf dist",
     "clean": "rimraf dist node_modules package-lock.json",
