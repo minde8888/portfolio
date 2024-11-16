@@ -19,14 +19,9 @@ export class Server {
         redisOn: false,
         url: 'redis://localhost:6379'
     };
-    private readonly defaultServerConfig: IServerConfig = {
-        port: 3000,
-        apiPrefix: '/v1/api'
-    };
-
     constructor(
-        private readonly config: IServerConfig = {},
-        private readonly redisConfig: IRedis = {},
+        private readonly config: IServerConfig,
+        private readonly redisConfig: IRedis,
         private readonly tokenConfig?: Partial<IJwtConfig>
     ) {
         this.app = express();
@@ -34,7 +29,7 @@ export class Server {
         this.setupMiddlewares();
         this.setupRoutes();
         this.redisConfig = { ...this.defaultRedisConfig, ...redisConfig };
-        this.config = { ...this.defaultServerConfig, ...config };
+        this.config = config;
         this.tokenConfig;
     }
 
@@ -55,7 +50,11 @@ export class Server {
             authRoutes(router, tokenConfig)
         ]);
 
-        this.app.use(this.config.apiPrefix || "/v1/api/", router);
+        const normalizedPrefix = this.config.apiPrefix
+            .replace(/\/+$/, '')
+            .replace(/^(?!\/)/, '/');
+
+        this.app.use(normalizedPrefix, router);
         this.app.use(errorMiddleware);
     }
 

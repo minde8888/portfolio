@@ -20,27 +20,27 @@ export default async (router: Router, config?: Partial<IJwtConfig>, use_redis?: 
     },
   });
 
-  router.get("users",
+  router.get("/users",
     authMiddleware,
     isDeletedMiddleware,
     roleMiddleware(['user', 'admin']),
     userController.getAllUsers);
 
-  router.get("users/:id",
+  router.get("/users/:id",
     isDeletedMiddleware,
     authMiddleware,
     roleMiddleware(['user']),
     userController.getUserById);
 
   router.put(
-    "users/:id",
+    "/users/:id",
     authMiddleware,
     roleMiddleware(['user', 'admin']),
     validateBody(userUpdateSchema),
     userController.updateUser
   );
 
-  router.delete("users/:id",
+  router.delete("/users/:id",
     authMiddleware,
     roleMiddleware(['user', 'admin']),
     userController.removeUser);

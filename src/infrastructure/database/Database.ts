@@ -15,12 +15,12 @@ export class Database implements IDatabase {
   private isConnected: boolean = false;
   
 
-  private constructor(config: IServerConfig = {}) {
+  private constructor(config: IServerConfig) {
     this.dataSource = createDataSource(config);
   }
 
   public static getInstance(config?: IServerConfig): Database {
-    if (!Database.instance) {
+    if (!Database.instance && config) {
       Database.instance = new Database(config);
     }
     return Database.instance;

@@ -1,28 +1,14 @@
 {
   "name": "cca_auth",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "repository": {
-    "url": "https://github.com/minde8888/protfolio"
-  },
-  "files": [
-    "dist",
-    "LICENSE",
-    "README.md"
-  ],
-  "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
-    }
-  },
+  "version": "0.0.4",
+  "description": "Clean Architecture Authentication module with TypeORM and JWT support",
+  "private": true,
   "scripts": {
     "clean:dist": "npx rimraf dist",
     "clean": "rimraf dist node_modules package-lock.json",
     "build": "node build.mjs",
     "rebuild": "npm run clean && npm install && npm run build",
+    "prepublishOnly": "npm run build",
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "ts-node src/infrastructure/database/scripts/generateMigration.ts",
@@ -31,7 +17,9 @@
     "migration:run:force": "ts-node ./src/infrastructure/cli/cli.ts run-migrations-force",
     "migration:fix": "ts-node src/infrastructure/cli/cli.ts fix-migrations",
     "migration:sync": "ts-node src/infrastructure/database/scripts/syncMigrations.ts",
-    "migration:list": "ts-node src/infrastructure/database/scripts/listMigrations.ts"
+    "migration:list": "ts-node src/infrastructure/database/scripts/listMigrations.ts",
+    "version": "git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "dependencies": {
     "@automapper/classes": "^8.8.1",
