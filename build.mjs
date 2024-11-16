@@ -1,16 +1,33 @@
 import { build } from 'esbuild';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import fs from 'fs';
+import path from 'path';
 
 const execAsync = promisify(exec);
 
-// Function to generate TypeScript declarations
+// Recreate __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Clean the output directory
+async function cleanDist() {
+    const distDir = path.resolve(__dirname, 'dist');
+    if (fs.existsSync(distDir)) {
+        fs.rmSync(distDir, { recursive: true, force: true });
+        console.log('Cleaned output directory.');
+    }
+}
+
+// Generate TypeScript declarations
 async function generateTypeDeclarations() {
     try {
-        await execAsync('tsc --emitDeclarationOnly --declaration');
+        await execAsync('tsc --emitDeclarationOnly --declaration --outDir dist/types');
         console.log('Type declarations generated successfully.');
     } catch (error) {
-        console.error('Error generating type declarations:', error);
+        console.error('Error generating type declarations:', error.message || error);
         process.exit(1);
     }
 }
@@ -24,30 +41,6 @@ const getCommonConfig = (plugins) => ({
     sourcemap: true,
     metafile: true,
     treeShaking: true,
-    // Svarbu: išlaikyti dekoratorių metaduomenis
-    keepNames: true,
-    loader: {
-        '.ts': 'ts'
-    },
-    // Įjungti eksperimentinių dekoratorių palaikymą
-    define: {
-        'process.env.NODE_ENV': '"production"',
-        'Reflect.metadata': 'Reflect.metadata',
-    },
-    banner: {
-        js: `
-            import { createRequire } from 'module';
-            import path from 'path';
-            import { fileURLToPath } from 'url';
-            import { dirname } from 'path';
-            
-            const require = createRequire(import.meta.url);
-            const __filename = fileURLToPath(import.meta.url);
-            const __dirname = dirname(__filename);
-            
-            import "reflect-metadata";
-        `,
-    },
     external: [
         '@nestjs/*',
         'typeorm',
@@ -60,6 +53,9 @@ const getCommonConfig = (plugins) => ({
         '@automapper/*',
         'tsyringe',
     ],
+    define: {
+        'process.env.NODE_ENV': '"production"',
+    },
     plugins,
 });
 
@@ -81,7 +77,7 @@ const buildAnalyticsPlugin = {
     },
 };
 
-// Function to build with specific format
+// Build function for specific format
 async function createBuild(format, outfile) {
     try {
         await build({
@@ -92,43 +88,36 @@ async function createBuild(format, outfile) {
         });
         console.log(`Build (${format}) completed: ${outfile}`);
     } catch (error) {
-        console.error(`Error during ${format} build:`, error);
+        console.error(`Error during ${format} build:`, error.message || error);
         process.exit(1);
     }
 }
 
 // Main build process
 async function runBuild() {
-    console.log('Starting build process...');
-    
-    // First ensure TypeScript compilation is clean
-    try {
-        await execAsync('tsc --noEmit');
-        console.log('TypeScript compilation check passed.');
-    } catch (error) {
-        console.error('TypeScript compilation check failed:', error);
-        process.exit(1);
-    }
-    
+    // Step 1: Clean the output directory
+    await cleanDist();
+
+    // Step 2: Generate TypeScript declarations
     await generateTypeDeclarations();
-    
-    // Build for CommonJS
-    await createBuild('cjs', 'dist/index.js');
-    
-    // Build for ESM
-    await createBuild('esm', 'dist/index.mjs');
-    
+
+    // Step 3: Build for CommonJS and ESM in parallel
+    await Promise.all([
+        createBuild('cjs', 'dist/index.js'),
+        createBuild('esm', 'dist/index.mjs'),
+    ]);
+
     console.log('All builds completed successfully!');
 }
 
 // Global error handling
 process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
+    console.error('Uncaught Exception:', error.message || error);
     process.exit(1);
 });
 
 process.on('unhandledRejection', (error) => {
-    console.error('Unhandled Rejection:', error);
+    console.error('Unhandled Rejection:', error.message || error);
     process.exit(1);
 });
 
