@@ -1,22 +1,21 @@
 import "reflect-metadata";
 import "dotenv/config";
 import { DataSource } from 'typeorm';
-
 import { IDatabase } from "../interfaces/IDatabase";
-
-import { createDatabaseIfNotExists } from "./utils/createDatabase";
-
 import { createDataSource } from "./config/createDataSource";
 import { IServerConfig } from "../../types/ServerConfig";
+import { DatabaseConfig } from "../interfaces/IDatabaseConfig";
+import { DatabaseManager } from "./utils/DatabaseManager";
 
 export class Database implements IDatabase {
   private static instance: Database;
   private dataSource: DataSource;
   private isConnected: boolean = false;
-  
+  private readonly databaseManager: DatabaseManager;
 
   private constructor(config: IServerConfig) {
     this.dataSource = createDataSource(config);
+    this.databaseManager = new DatabaseManager(config.databaseConfig as DatabaseConfig);
   }
 
   public static getInstance(config?: IServerConfig): Database {
@@ -33,8 +32,8 @@ export class Database implements IDatabase {
     }
 
     try {
-      await createDatabaseIfNotExists();
-      
+      await this.databaseManager.createDatabaseIfNotExists();
+
       if (!this.dataSource.isInitialized) {
         await this.dataSource.initialize();
         this.isConnected = true;

@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 const rootDir = path.resolve(__dirname, '../../../..');
-const migrationsDir = path.join(rootDir, 'src/infrastructure/database/migrations');
+const migrationsDir = path.join(rootDir, '../migrations');
 
 const files = fs.readdirSync(migrationsDir);
 console.log('Migration files:');

@@ -21,9 +21,8 @@ export default async (router: Router, config?: Partial<IJwtConfig>, use_redis?: 
   });
 
   router.get("/users",
-    authMiddleware,
+    // authMiddleware,
     isDeletedMiddleware,
-    roleMiddleware(['user', 'admin']),
     userController.getAllUsers);
 
   router.get("/users/:id",

@@ -15,10 +15,7 @@ import { IJwtConfig } from "./infrastructure/types";
 export class Server {
     private app: Application;
     private database: Database;
-    private readonly defaultRedisConfig: IRedis = {
-        redisOn: false,
-        url: 'redis://localhost:6379'
-    };
+
     constructor(
         private readonly config: IServerConfig,
         private readonly redisConfig: IRedis,
@@ -27,10 +24,9 @@ export class Server {
         this.app = express();
         this.database = Database.getInstance(config);
         this.setupMiddlewares();
-        this.setupRoutes();
-        this.redisConfig = { ...this.defaultRedisConfig, ...redisConfig };
-        this.config = config;
-        this.tokenConfig;
+        this.setupRoutes(tokenConfig);
+        this.redisConfig = redisConfig;
+        this.config = config;  
     }
 
     private setupMiddlewares(): void {
