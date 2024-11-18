@@ -1,4 +1,3 @@
-import { DataSource } from 'typeorm';
 import { Client } from 'pg';
 
 interface DatabaseConnectionOptions {

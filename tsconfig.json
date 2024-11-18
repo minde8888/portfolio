@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "commonjs",        // Pakeista iš commonjs į ESNext
+    "module": "commonjs",
     "lib": ["es6", "dom"],
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./src",
     "strict": true,
-    "moduleResolution": "Node",   // Užtikrinta, kad būtų didžioji raidė
-    "baseUrl": ".",
+    "moduleResolution": "node",
+    "baseUrl": "./src",
     "paths": {
-      "*": ["*", "src/*"]
+      "@/*": ["*"]
     },
     "esModuleInterop": true,
     "resolveJsonModule": true,
@@ -19,9 +19,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["./node_modules/@types", "./src/types"],
-    "allowJs": true,             // Pridėta
-    "declaration": true          // Pridėta dėl .d.ts failų
+    "allowJs": true,
+    "declaration": true
   },
-  "include": ["src/**/*", "out/**/*"],
+  "include": ["src/**/*", "DataSourceOptions.ts"],
   "exclude": ["node_modules", "dist"]
 }

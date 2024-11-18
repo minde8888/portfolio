@@ -1,12 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+
 import { AppDataSource } from '../config/createDataSource';
 
 async function syncMigrations() {
     await AppDataSource.initialize();
 
     const rootDir = path.resolve(__dirname, '../../../..');
-    const migrationsDir = path.join(rootDir, '../migrations');
+    const migrationsDir = path.join(rootDir, '../infrastructure/database/migrations');
     const files = fs.readdirSync(migrationsDir);
 
     const queryRunner = AppDataSource.createQueryRunner();

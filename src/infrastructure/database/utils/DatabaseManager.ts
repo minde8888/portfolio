@@ -1,79 +1,135 @@
 import { DatabaseConfig } from "../../../infrastructure/interfaces/IDatabaseConfig";
 import { DatabaseConnection } from "./DatabaseConnection";
 
+const createdDatabases: { [key: string]: Promise<void> | null } = {};
+
 export class DatabaseManager {
-    private static readonly POSTGRES_DB = 'postgres';
-    private static readonly CONNECTION_DELAY = 1000;
-  
-    constructor(private config: DatabaseConfig) {}
-  
-    async createDatabaseIfNotExists(): Promise<void> {
-      const adminConnection = new DatabaseConnection({
-        host: this.config.host ?? 'localhost',
-        port: this.config.port ?? 5432,
-        username: this.config.username ?? 'postgres',
-        password: this.config.password ?? 'admin',
-        database: DatabaseManager.POSTGRES_DB
-      });
-  
-      try {
-        await adminConnection.connect();
-        await this.ensureDatabaseExists(adminConnection);
-        await this.ensureDatabaseAccessible(adminConnection);
-      } finally {
-        await adminConnection.disconnect();
-      }
-  
-      await this.verifyTargetConnection();
+    private readonly defaultHost = 'localhost';
+    private readonly defaultPort = 5432;
+    private readonly defaultUsername = 'postgres';
+    private readonly defaultPassword = 'admin';
+    private readonly defaultDatabase = 'postgres';
+    private readonly connectionTimeout = 5000;
+    private readonly connectionDelay = 1000;
+    private readonly databaseKey: string;
+
+    constructor(private config: DatabaseConfig) {
+        this.databaseKey = `${config.host ?? this.defaultHost}:${config.port ?? this.defaultPort}/${config.database}`;
     }
-  
+
+    async createDatabaseIfNotExists(): Promise<void> {
+        // If there's an existing creation in progress, wait for it
+        if (createdDatabases[this.databaseKey]) {
+            try {
+                await createdDatabases[this.databaseKey];
+                return;
+            } catch (error) {
+                // If the previous attempt failed, we'll try again
+                delete createdDatabases[this.databaseKey];
+            }
+        }
+
+        // Store the promise of the creation attempt
+        createdDatabases[this.databaseKey] = this.initializeDatabase();
+
+        try {
+            await createdDatabases[this.databaseKey];
+        } catch (error) {
+            // Clean up on error
+            delete createdDatabases[this.databaseKey];
+            throw error;
+        }
+    }
+
+    private async initializeDatabase(): Promise<void> {
+        const adminConnection = await this.createAdminConnection();
+
+        try {
+            const exists = await this.checkDatabaseExists(adminConnection);
+
+            if (!exists) {
+                try {
+                    await this.ensureDatabaseExists(adminConnection);
+                } catch (error: any) {
+                    // Handle the case where another process created the database
+                    if (error.code === '23505') { // Duplicate database error
+                        console.log(`Database ${this.config.database} was created by another process.`);
+                    } else {
+                        throw error;
+                    }
+                }
+                await this.ensureDatabaseAccessible(adminConnection);
+            } else {
+                console.log(`Database ${this.config.database} already exists.`);
+            }
+        } finally {
+            await adminConnection.disconnect();
+        }
+
+        await this.verifyTargetConnection();
+    }
+
+    private async createAdminConnection(): Promise<DatabaseConnection> {
+        const connection = new DatabaseConnection({
+            host: this.config.host ?? this.defaultHost,
+            port: this.config.port ?? this.defaultPort,
+            username: this.config.username ?? this.defaultUsername,
+            password: this.config.password ?? this.defaultPassword,
+            database: this.defaultDatabase,
+        });
+
+        await connection.connect();
+        return connection;
+    }
+
+    private async checkDatabaseExists(connection: DatabaseConnection): Promise<boolean> {
+        const result = await connection.query(
+            'SELECT datname FROM pg_database WHERE datname = $1',
+            [this.config.database]
+        );
+        return result.rowCount > 0;
+    }
+
     private async ensureDatabaseExists(connection: DatabaseConnection): Promise<void> {
-      const result = await connection.query(
-        'SELECT datname, datallowconn FROM pg_database WHERE datname = $1',
-        [this.config.database]
-      );
-  
-      if (result.rowCount === 0) {
         console.log(`Creating database ${this.config.database}...`);
+        
+        // Add IF NOT EXISTS to prevent errors if database was created concurrently
         await connection.query(`CREATE DATABASE "${this.config.database}"`);
         console.log(`Database ${this.config.database} created successfully.`);
-      } else {
-        console.log(`Database ${this.config.database} already exists.`);
-      }
     }
-  
+
     private async ensureDatabaseAccessible(connection: DatabaseConnection): Promise<void> {
-      const result = await connection.query(
-        'SELECT datallowconn FROM pg_database WHERE datname = $1',
-        [this.config.database]
-      );
-  
-      if (result.rowCount > 0 && !result.rows[0].datallowconn) {
-        console.log('Fixing database connection permissions...');
-        await connection.query(
-          'UPDATE pg_database SET datallowconn = true WHERE datname = $1',
-          [this.config.database]
+        const result = await connection.query(
+            'SELECT datallowconn FROM pg_database WHERE datname = $1',
+            [this.config.database]
         );
-      }
+
+        if (result.rowCount > 0 && !result.rows[0].datallowconn) {
+            console.log('Fixing database connection permissions...');
+            await connection.query(
+                'UPDATE pg_database SET datallowconn = true WHERE datname = $1',
+                [this.config.database]
+            );
+        }
     }
-  
+
     private async verifyTargetConnection(): Promise<void> {
-      await new Promise(resolve => setTimeout(resolve, DatabaseManager.CONNECTION_DELAY));
-  
-      const targetConnection = new DatabaseConnection({
-        host: this.config.host ?? 'localhost',
-        port: this.config.port ?? 5432,
-        username: this.config.username ?? 'postgres',
-        password: this.config.password ?? 'admin',
-        database: this.config.database,
-        connectionTimeoutMillis: 5000
-      });
-  
-      try {
-        await targetConnection.connect();
-        console.log(`Successfully connected to ${this.config.database} database`);
-      } finally {
-        await targetConnection.disconnect();
-      }
+        await new Promise(resolve => setTimeout(resolve, this.connectionDelay));
+
+        const targetConnection = new DatabaseConnection({
+            host: this.config.host ?? this.defaultHost,
+            port: this.config.port ?? this.defaultPort,
+            username: this.config.username ?? this.defaultUsername,
+            password: this.config.password ?? this.defaultPassword,
+            database: this.config.database,
+            connectionTimeoutMillis: this.connectionTimeout
+        });
+
+        try {
+            await targetConnection.connect();
+            console.log(`Successfully connected to ${this.config.database} database`);
+        } finally {
+            await targetConnection.disconnect();
+        }
     }
-  }
+}

@@ -1,37 +1,22 @@
 import fs from 'fs';
 import path from 'path';
 import { DataSource } from "typeorm";
+
 import { MigrationExecutor } from "typeorm/migration/MigrationExecutor";
-import { DataSourceOptions } from '../../../out/DataSourceOptions';
+
+import { AppDataSource } from "../database/config/createDataSource"
 
 export class MigrationService {
-    private readonly dataSource: DataSource;
-
-    private static readonly ENTITIES_PATH = path.join(__dirname, '../entities/*Entity.{ts,js}');
-    private static readonly MIGRATIONS_PATH = path.join(__dirname, '../database/migrations/**/*.{ts,js}');
-    private static readonly MIGRATIONS_DIR = path.join(__dirname, '..', 'database', 'migrations');
-
-    constructor() {
-        this.dataSource = new DataSource({
-            ...DataSourceOptions,
-            entities: [MigrationService.ENTITIES_PATH],
-            migrations: [MigrationService.MIGRATIONS_PATH],
-        });
-    }
-
-    private async initializeDataSource(): Promise<void> {
-        if (!this.dataSource.isInitialized) {
-            await this.dataSource.initialize();
-        }
-    }
-
-    private logError(action: string, error: unknown): void {
-        console.error(`Error during ${action}:`, error);
+    private dataSource: DataSource
+    constructor() { 
+        this.dataSource = AppDataSource;
     }
 
     async runMigrations(): Promise<void> {
         try {
-            await this.initializeDataSource();
+            if (!this.dataSource.isInitialized) {
+                await this.dataSource.initialize();
+            }
 
             const migrationExecutor = new MigrationExecutor(this.dataSource);
             const pendingMigrations = await migrationExecutor.getPendingMigrations();
@@ -44,21 +29,26 @@ export class MigrationService {
                 console.log('No pending migrations.');
             }
         } catch (error) {
-            this.logError('running migrations', error);
+            console.error('Error running migrations:', error);
             throw error;
         }
     }
 
     async revertLastMigration(): Promise<void> {
         try {
-            await this.initializeDataSource();
+            if (!this.dataSource.isInitialized) {
+                await this.dataSource.initialize();
+            }
 
             const migrationExecutor = new MigrationExecutor(this.dataSource);
             const executedMigrations = await migrationExecutor.getExecutedMigrations();
 
             console.log('Executed migrations:', executedMigrations);
 
-            const migrationFiles = fs.readdirSync(MigrationService.MIGRATIONS_DIR);
+            const migrationsDir = path.join(__dirname, '..', 'database', 'migrations');
+            console.log('Migrations directory:', migrationsDir);
+
+            const migrationFiles = fs.readdirSync(migrationsDir);
             console.log('Migration files found:', migrationFiles);
 
             if (executedMigrations.length > 0) {
@@ -69,7 +59,7 @@ export class MigrationService {
                 console.log('No migrations to revert.');
             }
         } catch (error) {
-            this.logError('reverting migration', error);
+            console.error('Error reverting migration:', error);
             throw error;
         }
     }
