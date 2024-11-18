@@ -5,7 +5,7 @@ export const DataSourceOptions = {
     port: parseInt('5432'),
     username: 'postgres',
     password: 'admin',
-    database: 'test',  
+    database: 'test_db_3',  
     synchronize: false,
     logging: true,
     subscribers: []
