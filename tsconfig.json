@@ -22,6 +22,6 @@
     "allowJs": true,
     "declaration": true
   },
-  "include": ["src/**/*", "DataSourceOptions.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

@@ -2,7 +2,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import path from 'path';
 import { IServerConfig } from '../../../types/ServerConfig';
 
-const configPath = path.join(process.cwd(), '..', 'DataSourceOptions.ts');
+const configPath = path.join(process.cwd(), 'DataSourceOptions.ts');
 
 let customDbConfig: any;
 try {
