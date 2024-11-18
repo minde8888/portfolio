@@ -16,37 +16,69 @@ yarn add cca_auth
 ## Quick Start
 
 ```typescript
-import { bootstrap, IServerConfig } from 'cca_auth';
+import { bootstrap, IServerConfig } from "cca_auth";
 
 const config: IServerConfig = {
   port: 3000,
-  apiPrefix: '/api/v1',
+  apiPrefix: "/api/v1",
   databaseConfig: {
-    host: 'localhost',
+    host: "localhost",
     port: 5432,
-    username: 'postgres',
-    password: 'password',
-    database: 'auth_db'
-  }
+    username: "postgres",
+    password: "password",
+    database: "auth_db",
+  },
 };
 
 // Optional Redis configuration
 const redisConfig = {
   redisOn: true,
-  url: 'redis://localhost:6379'
+  url: "redis://localhost:6379",
 };
 
 // Optional JWT configuration
 const jwtConfig = {
-  accessTokenSecret: 'your-access-token-secret',
-  refreshTokenSecret: 'your-refresh-token-secret',
-  accessTokenExpiry: '15m',
-  refreshTokenExpiry: '7d'
+  accessTokenSecret: "your-access-token-secret",
+  refreshTokenSecret: "your-refresh-token-secret",
+  accessTokenExpiry: "15m",
+  refreshTokenExpiry: "7d",
 };
 
 bootstrap(config, redisConfig, jwtConfig)
-  .then(() => console.log('Server started successfully'))
+  .then(() => console.log("Server started successfully"))
   .catch(console.error);
+```
+
+## Database Configuration Guide
+
+### Basic Setup
+
+1. Create a `.env` file in your project root:
+
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=your_secure_password
+DB_NAME=auth_db
+DB_LOGGING=true
+NODE_ENV=development
+```
+
+2. Configure TypeORM entities and migrations:
+
+```typescript
+const databaseConfig: DatabaseConfig = {
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || "5432"),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  logging: process.env.DB_LOGGING === "true",
+  synchronize: process.env.NODE_ENV !== "production",
+  entities: ["dist/**/*.entity.js"],
+  migrations: ["dist/migrations/*.js"],
+};
 ```
 
 ## Features
