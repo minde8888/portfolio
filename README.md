@@ -75,9 +75,7 @@ const databaseConfig: DatabaseConfig = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   logging: process.env.DB_LOGGING === "true",
-  synchronize: process.env.NODE_ENV !== "production",
-  entities: ["dist/**/*.entity.js"],
-  migrations: ["dist/migrations/*.js"],
+  synchronize: process.env.NODE_ENV !== "production"
 };
 ```
 
