@@ -22,6 +22,7 @@ export class DatabaseManager {
         if (createdDatabases[this.databaseKey]) {
             try {
                 await createdDatabases[this.databaseKey];
+                
                 return;
             } catch (error) {
                 // If the previous attempt failed, we'll try again

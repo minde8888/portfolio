@@ -1,13 +1,7 @@
 import { Client } from 'pg';
 
-interface DatabaseConnectionOptions {
-  host?: string;
-  port?: number;
-  username?: string;
-  password?: string;
-  database?: string;
-  connectionTimeoutMillis?: number;
-}
+import { DatabaseConnectionOptions } from '../../interfaces/DatabaseConnectionOptions';
+
 
 export class DatabaseConnection {
   private client: Client | null = null;

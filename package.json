@@ -1,6 +1,7 @@
 {
   "name": "cca_auth",
-  "version": "0.1.9",
+  "version": "0.1.11",
+  "type": "commonjs",
   "description": "Clean Architecture Authentication module with TypeORM and JWT support",
   "author": "Mindaugas Baltrunas",
   "license": "MIT",
@@ -50,7 +51,8 @@
     "build": "node build.mjs",
     "rebuild": "npm run clean && npm install && npm run build",
     "prepublishOnly": "npm run build",
-    "start": "ts-node -r tsconfig-paths/register src/index.ts",
+    "start:dev": "ts-node -r tsconfig-paths/register src/index.ts",
+    "start:dist": "node dist/index.js",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "ts-node src/infrastructure/database/scripts/generateMigration.ts",
     "migration:run": "ts-node src/infrastructure/cli/cli.ts run-migrations",
