@@ -1,19 +1,35 @@
 # cca_auth
 
-A Clean Architecture Authentication module for Node.js applications, providing robust authentication, user management, and role-based access control built on Express.js.
+🔐 A robust Clean Architecture Authentication module for Node.js applications, providing enterprise-grade authentication, user management, and role-based access control.
 
 [![npm version](https://badge.fury.io/js/cca_auth.svg)](https://badge.fury.io/js/cca_auth)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Installation
+## ✨ Key Features
+
+- 🏗️ **Clean Architecture Design**: Follows best practices for maintainable and scalable code
+- 🔐 **JWT Authentication**: Secure token-based auth with access and refresh tokens
+- 👥 **Role-Based Access Control**: Built-in roles (ADMIN, USER, GUEST)
+- ✅ **Input Validation**: Robust request validation using Yup
+- 🗑️ **Soft Delete**: Safe data handling with soft delete functionality
+- 📝 **TypeScript Support**: Full TypeScript support with type definitions
+- 🔄 **Error Handling**: Consistent and informative error responses
+- 📦 **Redis Support**: Optional Redis integration for enhanced performance
+- 🔒 **Security First**: Built-in security features including password hashing and JWT protection
+
+## 📦 Installation
 
 ```bash
+# Using npm
 npm install cca_auth
-# or
+
+# Using yarn
 yarn add cca_auth
 ```
 
-## Quick Start
+## 🚀 Quick Start
+
+1. **Basic Setup**
 
 ```typescript
 import { bootstrap, IServerConfig } from "cca_auth";
@@ -30,13 +46,21 @@ const config: IServerConfig = {
   },
 };
 
-// Optional Redis configuration
+bootstrap(config)
+  .then(() => console.log("✅ Server started successfully"))
+  .catch(console.error);
+```
+
+2. **Advanced Configuration**
+
+```typescript
+// Redis configuration (optional)
 const redisConfig = {
   redisOn: true,
   url: "redis://localhost:6379",
 };
 
-// Optional JWT configuration
+// JWT configuration (optional)
 const jwtConfig = {
   accessTokenSecret: "your-access-token-secret",
   refreshTokenSecret: "your-refresh-token-secret",
@@ -44,54 +68,41 @@ const jwtConfig = {
   refreshTokenExpiry: "7d",
 };
 
-bootstrap(config, redisConfig, jwtConfig)
-  .then(() => console.log("Server started successfully"))
-  .catch(console.error);
+bootstrap(config, redisConfig, jwtConfig);
 ```
 
-## Database Configuration Guide
+## ⚙️ Configuration Guide
 
-### Basic Setup
+### Environment Variables
 
-1. Create a `.env` file in your project root:
+Create a `.env` file in your project root:
 
 ```env
+# Database Configuration
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=your_secure_password
 DB_NAME=auth_db
 DB_LOGGING=true
+
+# Application Configuration
 NODE_ENV=development
+API_PREFIX=/api/v1
+PORT=3000
+
+# JWT Configuration
+JWT_ACCESS_SECRET=your-access-token-secret
+JWT_REFRESH_SECRET=your-refresh-token-secret
+JWT_ACCESS_EXPIRY=15m
+JWT_REFRESH_EXPIRY=7d
+
+# Redis Configuration (Optional)
+REDIS_URL=redis://localhost:6379
+REDIS_ENABLED=true
 ```
 
-2. Configure TypeORM entities and migrations:
-
-```typescript
-const databaseConfig: DatabaseConfig = {
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || "5432"),
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  logging: process.env.DB_LOGGING === "true",
-  synchronize: process.env.NODE_ENV !== "production"
-};
-```
-
-## Features
-
-- 🏗️ Clean Architecture design pattern
-- 🔐 JWT Authentication with access and refresh tokens
-- 👥 Role-based access control (ADMIN, USER, GUEST)
-- ✅ Input validation using Yup
-- 🗑️ Soft delete functionality
-- 📝 TypeScript support
-- 🔄 Consistent error handling
-
-## Configuration
-
-### Server Configuration (IServerConfig)
+### Configuration Interfaces
 
 ```typescript
 interface IServerConfig {
@@ -99,11 +110,7 @@ interface IServerConfig {
   apiPrefix?: string;
   databaseConfig?: DatabaseConfig;
 }
-```
 
-### Database Configuration
-
-```typescript
 interface DatabaseConfig {
   host?: string;
   port?: number;
@@ -115,20 +122,12 @@ interface DatabaseConfig {
   entities?: string[];
   migrations?: string[];
 }
-```
 
-### Redis Configuration
-
-```typescript
 interface IRedis {
   redisOn?: boolean;
   url?: string;
 }
-```
 
-### JWT Configuration
-
-```typescript
 interface IJwtConfig {
   accessTokenSecret: string;
   refreshTokenSecret: string;
@@ -137,34 +136,42 @@ interface IJwtConfig {
 }
 ```
 
-## API Endpoints
+## 🔗 API Reference
 
-### Authentication
+### Authentication Endpoints
 
 ```typescript
-// Register a new user
-POST ${apiPrefix}/register
-Content-Type: application/json
-
+/**
+ * Register a new user
+ * POST ${apiPrefix}/register
+ */
 {
     "email": "user@example.com",
     "name": "User Name",
     "password": "password123"
 }
 
-// Login
-POST ${apiPrefix}/login
-Content-Type: application/json
-
+/**
+ * Login
+ * POST ${apiPrefix}/login
+ */
 {
     "email": "user@example.com",
     "password": "password123"
 }
+
+/**
+ * Refresh Token
+ * POST ${apiPrefix}/refresh
+ */
+{
+    "refreshToken": "your-refresh-token"
+}
 ```
 
-### User Management
+### User Management Endpoints
 
-All endpoints require JWT authentication via Bearer token:
+All endpoints require JWT authentication via Bearer token in the Authorization header.
 
 ```typescript
 // Get all users
@@ -175,47 +182,63 @@ GET ${apiPrefix}/users/:id
 
 // Update user
 PUT ${apiPrefix}/users/:id
+{
+    "name": "Updated Name",
+    "email": "updated@example.com"
+}
 
-// Delete user
+// Delete user (soft delete)
 DELETE ${apiPrefix}/users/:id
 ```
 
-## Error Handling
+## 🔒 Security Features
 
-The module provides consistent error responses:
+- **Password Security**: Automatic password hashing using bcrypt
+- **JWT Protection**: Secure token-based authentication
+- **Role-Based Security**: Fine-grained access control
+- **Data Protection**: Soft delete functionality for safe data handling
+- **Input Validation**: Request validation using Yup
+- **Database Security**: Secure TypeORM operations
+
+## 🛠️ Error Handling
+
+The module provides consistent error responses across all endpoints:
 
 ```typescript
 {
     "status": "error",
-    "message": "Error message here",
-    "statusCode": 404 // HTTP status code
+    "message": "Detailed error message",
+    "statusCode": 404  // HTTP status code
+    "error": {         // Optional detailed error information
+        "field": "email",
+        "type": "validation"
+    }
 }
 ```
 
-## Security Features
+## 📚 Dependencies
 
-- Password hashing using bcrypt
-- JWT-based authentication
-- Role-based access control
-- Soft delete functionality
-- Request validation
-- TypeORM for database operations
+- **Core**: Express.js, TypeScript
+- **Database**: TypeORM, PostgreSQL
+- **Caching**: Redis (optional)
+- **Security**: jsonwebtoken, bcrypt
+- **Validation**: Yup
+- **Types**: @types/node, @types/express
 
-## Dependencies
+## 🤝 Contributing
 
-- Express.js
-- TypeORM
-- PostgreSQL
-- Redis (optional)
-- jsonwebtoken
-- Yup
-- TypeScript
-- bcrypt
+We welcome contributions! Here's how you can help:
 
-## Contributing
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-Contributions are welcome! Please feel free to submit a Pull Request. 
+## 📝 License
 
-## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 🙋‍♂️ Support
+
+- 📧 Email: mindaugaskul@gmail.com

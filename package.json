@@ -1,6 +1,6 @@
 {
   "name": "cca_auth",
-  "version": "0.1.6",
+  "version": "0.1.9",
   "description": "Clean Architecture Authentication module with TypeORM and JWT support",
   "author": "Mindaugas Baltrunas",
   "license": "MIT",
@@ -31,9 +31,10 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
   "engines": {
@@ -45,6 +46,7 @@
   "scripts": {
     "clean:dist": "npx rimraf dist",
     "clean": "rimraf dist node_modules package-lock.json",
+    "build:tsup": "tsup src/index.ts --format cjs,esm --dts --metafile",
     "build": "node build.mjs",
     "rebuild": "npm run clean && npm install && npm run build",
     "prepublishOnly": "npm run build",
@@ -93,6 +95,7 @@
     "rimraf": "^5.0.10",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsup": "^8.3.5",
     "typescript": "^5.6.3"
   },
   "peerDependencies": {

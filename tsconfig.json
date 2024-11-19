@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
+    "target": "es2020",
+    "module": "ESNext",
     "lib": ["es6", "dom"],
     "sourceMap": true,
     "outDir": "./dist",
