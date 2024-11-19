@@ -1,32 +1,21 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import path from 'path';
+import 'dotenv/config';
+
 import { IServerConfig } from '../../../types/ServerConfig';
-
-const configPath = path.join(process.cwd(), 'DataSourceOptions.ts');
-
-let customDbConfig: any;
-try {
-    console.log(`Attempting to load config from: ${configPath}`);
-    const imported = require(configPath);
-    customDbConfig = imported.DataSourceOptions || imported.default?.DataSourceOptions;
-} catch (error) {
-    console.error(`Failed to load database configuration from ${configPath}`);
-    console.error('Error:', error);
-    throw new Error('Database configuration file not found');
-}
 
 export function createDataSource(config?: IServerConfig): DataSource {
     const options: DataSourceOptions = {
         type: 'postgres',
-        host: config?.databaseConfig?.host ?? customDbConfig.host,
-        port: config?.databaseConfig?.port ?? customDbConfig.port,
-        username: config?.databaseConfig?.username ?? customDbConfig.username,
-        password: config?.databaseConfig?.password ?? customDbConfig.password,
-        database: config?.databaseConfig?.database ?? customDbConfig.database,
+        host: config?.databaseConfig?.host ?? process.env.DB_HOST,
+        port: config?.databaseConfig?.port ?? parseInt(process.env.DB_PORT || '5432'),
+        username: config?.databaseConfig?.username ?? process.env.DB_USERNAME,
+        password: config?.databaseConfig?.password ?? process.env.DB_PASSWORD,
+        database: config?.databaseConfig?.database ?? process.env.DB_NAME,
         entities: config?.databaseConfig?.entities ?? [path.join(__dirname, '../../entities', '*.{ts,js}')],
         migrations: config?.databaseConfig?.migrations ?? [path.join(__dirname, '../migrations', '*.{ts,js}')],
-        synchronize: config?.databaseConfig?.synchronize ?? false,
-        logging: config?.databaseConfig?.logging ?? true,
+        synchronize: config?.databaseConfig?.synchronize ?? process.env.NODE_ENV === 'development',
+        logging: config?.databaseConfig?.logging ?? process.env.DB_LOGGING === 'true',
         subscribers: []
     };
 
