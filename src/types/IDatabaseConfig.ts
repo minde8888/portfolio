@@ -1,4 +1,4 @@
-export interface DatabaseConfig {
+export interface IDatabaseConfig {
     host?: string;
     port?: number;
     username?: string;
@@ -8,4 +8,4 @@ export interface DatabaseConfig {
     synchronize?: boolean;
     entities?: string[];
     migrations?: string[];
-   }
+}

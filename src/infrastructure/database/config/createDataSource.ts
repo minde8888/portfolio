@@ -2,20 +2,16 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import path from 'path';
 import 'dotenv/config';
 
-import { IServerConfig } from '../../../types/ServerConfig';
+import { IServerConfig } from '../../../types/IServerConfig';
+
+import { AuthEntity } from '../../entities/AuthEntity';
+import { UserEntity } from '../../entities/UserEntity';
+import { BaseEntity } from '../../entities/BaseEntity';
+
 
 export function createDataSource(config?: IServerConfig): DataSource {
-
-    const isDist = __dirname.includes('dist');
-    const baseDir = isDist ? path.join(__dirname, '..') : __dirname;
-
-    const entitiesPath = isDist 
-    ? [path.join(baseDir, 'entities', '*.js')] // Only .js in production
-    : [path.join(baseDir, '../../entities', '*.{ts,js}')];
-
-const migrationsPath = isDist
-    ? [path.join(baseDir, 'migrations', '*.js')] // Only .js in production
-    : [path.join(baseDir, '../migrations', '*.{ts,js}')];
+    const projectRoot = process.cwd();
+    const migrationsPath = [path.join(projectRoot, 'dist', 'infrastructure', 'database', 'migrations', '*.js')];
 
     const options: DataSourceOptions = {
         type: 'postgres',
@@ -24,11 +20,11 @@ const migrationsPath = isDist
         username: config?.databaseConfig?.username ?? process.env.DB_USERNAME,
         password: config?.databaseConfig?.password ?? process.env.DB_PASSWORD,
         database: config?.databaseConfig?.database ?? process.env.DB_NAME,
-        entities: entitiesPath,
+        entities: [AuthEntity, UserEntity, BaseEntity],
         migrations: migrationsPath,
         synchronize: config?.databaseConfig?.synchronize ?? process.env.NODE_ENV === 'development',
-        logging: config?.databaseConfig?.logging ?? process.env.DB_LOGGING === 'true',
-        subscribers: []
+        logging: true,
+        entitySkipConstructor: true
     };
     return new DataSource(options);
 }

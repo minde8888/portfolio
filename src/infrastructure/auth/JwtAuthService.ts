@@ -37,6 +37,8 @@ export class JwtAuthService implements IAuthService {
 
   async validateUser(email: string, password: string): Promise<Auth | null> {
     try {
+      console.log(email, password);
+      
       const user = await this.authRepository.findByEmail(email);
 
       if (!user) {

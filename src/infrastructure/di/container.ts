@@ -32,13 +32,12 @@ import { IContainerResult } from '../interfaces/IContainerResult';
 
 import { IJwtConfig } from '../types';
 
-
 export async function container(
   config?: Partial<IJwtConfig>,
   use_redis?: boolean,
   redis_url?: string
 ): Promise<IContainerResult> {
-  
+
   const database = Database.getInstance();
   await database.connect();
 

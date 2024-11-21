@@ -7,27 +7,22 @@ import { UserEntity } from "../entities/UserEntity";
 
 import { BaseRepository } from "./BaseRepository";
 
-import { EmailAlreadyExistsError } from "../../utils/Errors/Errors";
-
 export class TypeORMUserRepository extends BaseRepository<UserEntity, User> implements IUserRepository {
     constructor(repository: Repository<UserEntity>) {
         super(repository);
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        return await this.findByProperty('email', email);
+        return await this.findOneByField('email', email);
     }
 
     async findById(id: string): Promise<User | null> {
-        return await this.findByProperty('id', id);
+        return await this.findOneByField('id', id);
     }
 
     async create(user: User): Promise<{ status: number; error?: string }> {
-        const existingUser = await this.findByEmail(user.email);
-        if (existingUser) {
-            throw new EmailAlreadyExistsError();
-        }
-        return await super.create(user);
+        await this.findOneByEmail('email',user.email);
+         return await super.create(user);
     }
     
 

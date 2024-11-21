@@ -14,10 +14,11 @@ export class TypeORMAuthRepository extends BaseRepository<AuthEntity, Auth> impl
     }
 
     async findByEmail(email: string): Promise<Auth | null> {
-        return await this.findByProperty('email', email);
+        return await this.findOneByField('email', email);
     }
 
     async create(auth: Omit<Auth, 'id'>): Promise<{ status: number; error?: string; data?: Auth }> {
+        await this.findOneByEmail('email', auth.email);
         const newAuth = new Auth(
             uuidv4(),
             auth.email,

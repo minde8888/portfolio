@@ -1,4 +1,4 @@
-import { DatabaseConfig } from "../../../infrastructure/interfaces/IDatabaseConfig";
+import { IDatabaseConfig } from "../../../types/IDatabaseConfig";
 import { DatabaseConnection } from "./DatabaseConnection";
 
 const createdDatabases: { [key: string]: Promise<void> | null } = {};
@@ -13,7 +13,7 @@ export class DatabaseManager {
     private readonly connectionDelay = 1000;
     private readonly databaseKey: string;
 
-    constructor(private config: DatabaseConfig) {
+    constructor(private config: IDatabaseConfig) {
         this.databaseKey = `${config.host ?? this.defaultHost}:${config.port ?? this.defaultPort}/${config.database}`;
     }
 

@@ -1,5 +1,5 @@
 
-export interface IRedis {
+export interface IRedisConfig {
     redisOn?: boolean,
     url?: string
 }

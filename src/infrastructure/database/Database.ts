@@ -3,8 +3,8 @@ import "dotenv/config";
 import { DataSource } from 'typeorm';
 import { IDatabase } from "../interfaces/IDatabase";
 import { createDataSource } from "./config/createDataSource";
-import { IServerConfig } from "../../types/ServerConfig";
-import { DatabaseConfig } from "../interfaces/IDatabaseConfig";
+import { IServerConfig } from "../../types/IServerConfig";
+import { IDatabaseConfig } from "../../types/IDatabaseConfig";
 import { DatabaseManager } from "./utils/DatabaseManager";
 
 export class Database implements IDatabase {
@@ -15,7 +15,7 @@ export class Database implements IDatabase {
 
   private constructor(config: IServerConfig) {
     this.dataSource = createDataSource(config);
-    this.databaseManager = new DatabaseManager(config.databaseConfig as DatabaseConfig);
+    this.databaseManager = new DatabaseManager(config.databaseConfig as IDatabaseConfig);
   }
 
   public static getInstance(config?: IServerConfig): Database {
@@ -35,7 +35,7 @@ export class Database implements IDatabase {
       await this.databaseManager.createDatabaseIfNotExists();
 
       if (!this.dataSource.isInitialized) {
-        await this.dataSource.initialize();
+        await this.dataSource.initialize()
         this.isConnected = true;
         console.log("Database connected and initialized");
       }

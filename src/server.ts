@@ -8,8 +8,8 @@ import authRoutes from "./presentation/routes/authRoutes";
 import { isDeletedMiddleware } from "./presentation/middlewares/deletedEntityMiddleware";
 import { errorMiddleware } from "./presentation/middlewares/errorMiddleware";
 
-import { IServerConfig } from "./types/ServerConfig";
-import { IRedis } from "./types/RedisConfig";
+import { IServerConfig } from "./types/IServerConfig";
+import { IRedisConfig } from "./types/IRedisConfig";
 import { IJwtConfig } from "./infrastructure/types";
 
 export class Server {
@@ -18,7 +18,7 @@ export class Server {
 
     constructor(
         private readonly config: IServerConfig,
-        private readonly redisConfig: IRedis,
+        private readonly redisConfig: IRedisConfig,
         private readonly tokenConfig?: Partial<IJwtConfig>
     ) {
         this.app = express();
