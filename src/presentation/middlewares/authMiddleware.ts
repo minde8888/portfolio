@@ -17,6 +17,9 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const decodedToken: IDecodedToken = await authController.verifyToken(token);
     (req as IAuthenticatedRequest).user = decodedToken;
 
+    console.log("decodedToken", decodedToken);
+    
+
     next();
   } catch (error) {
     console.error('Authentication error:', error);

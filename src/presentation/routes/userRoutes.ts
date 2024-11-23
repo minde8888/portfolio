@@ -11,7 +11,7 @@ import { authMiddleware } from "../middlewares/authMiddleware";
 import { roleMiddleware } from "../middlewares/roleMiddleware";
 import { isDeletedMiddleware } from "../middlewares/deletedEntityMiddleware";
 
-export default async (router: Router, config?: Partial<IJwtConfig>, use_redis?: boolean, redis_url?: string): Promise<void> => {
+export default async (router: Router, config?: IJwtConfig, use_redis?: boolean, redis_url?: string): Promise<void> => {
   const { userController }: IContainerResult = await container(config, use_redis, redis_url);
 
   const validateBody = (schema: any) => expressYupMiddleware({

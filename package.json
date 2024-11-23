@@ -1,6 +1,6 @@
 {
   "name": "cca_auth",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "type": "commonjs",
   "description": "Clean Architecture Authentication module with TypeORM and JWT support",
   "author": "Mindaugas Baltrunas",

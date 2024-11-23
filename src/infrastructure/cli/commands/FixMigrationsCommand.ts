@@ -1,4 +1,4 @@
-import { AppDataSource } from "../../database/config/createDataSource";
+import { AppDataSource } from "../../database/config";
 
 import fs from 'fs';
 

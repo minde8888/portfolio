@@ -16,15 +16,20 @@ export class JwtAuthService implements IAuthService {
 
   constructor(
     private readonly authRepository: IAuthRepository,
-    config?: Partial<IJwtConfig>
+    config?: IJwtConfig
   ) {
     this.jwtConfig = {
-      accessTokenSecret: 'Kwq23JSDFk23mzx0sdf#32q@#$@wejfs',
-      refreshTokenSecret: '239fSFsf02jkljXZdf02!Q$Rfes32fd',
+      accessTokenSecret: process.env.JWT_ACCESS_SECRET || 'default-access-secret',
+      refreshTokenSecret: process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
       accessTokenExpiry: '15m',
-      refreshTokenExpiry: '7d',
-      ...config
-    };
+      refreshTokenExpiry: '7d'
+    }
+    if (config) {
+      this.jwtConfig = {
+        ...this.jwtConfig,
+        ...config
+      };
+    }
 
     this.validateConfiguration();
   }
@@ -38,7 +43,7 @@ export class JwtAuthService implements IAuthService {
   async validateUser(email: string, password: string): Promise<Auth | null> {
     try {
       console.log(email, password);
-      
+
       const user = await this.authRepository.findByEmail(email);
 
       if (!user) {
@@ -89,6 +94,8 @@ export class JwtAuthService implements IAuthService {
 
   private async verifyToken(token: string, secret: string): Promise<IDecodedToken> {
     try {
+      console.log("token", token);
+      console.log("secret", secret);
       return jwt.verify(token, secret) as IDecodedToken;
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError || error instanceof jwt.JsonWebTokenError) {

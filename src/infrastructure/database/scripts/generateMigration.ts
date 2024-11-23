@@ -8,7 +8,7 @@ if (!migrationName) {
 }
 
 const rootDir = process.cwd();
-const configPath = path.join(rootDir, 'src', 'infrastructure', 'database', 'config', 'createDataSource.ts');
+const configPath = path.join(rootDir, 'src', 'infrastructure', 'database', 'config', 'index.ts');
 const migrationsDir = path.join(rootDir, 'src', 'infrastructure', 'database', 'migrations');
 
 // Wrap paths in quotes to handle spaces

@@ -19,7 +19,7 @@ export class Server {
     constructor(
         private readonly config: IServerConfig,
         private readonly redisConfig: IRedisConfig,
-        private readonly tokenConfig?: Partial<IJwtConfig>
+        private readonly tokenConfig?: IJwtConfig
     ) {
         this.app = express();
         this.database = Database.getInstance(config);
@@ -34,7 +34,7 @@ export class Server {
         this.app.use(isDeletedMiddleware);
     }
 
-    private async setupRoutes(tokenConfig?: Partial<IJwtConfig>,): Promise<void> {
+    private async setupRoutes(tokenConfig?: IJwtConfig,): Promise<void> {
 
         const redisOn = this.redisConfig.redisOn ?? false;
         const url = this.redisConfig.url ?? 'redis://localhost:6379';

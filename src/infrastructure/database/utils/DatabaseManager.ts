@@ -1,5 +1,6 @@
 import { IDatabaseConfig } from "../../../types/IDatabaseConfig";
 import { DatabaseConnection } from "./DatabaseConnection";
+import { MigrationService } from "../../services/MigrationService";
 
 const createdDatabases: { [key: string]: Promise<void> | null } = {};
 
@@ -18,11 +19,11 @@ export class DatabaseManager {
     }
 
     async createDatabaseIfNotExists(): Promise<void> {
+        const migrationService = new MigrationService();
         // If there's an existing creation in progress, wait for it
         if (createdDatabases[this.databaseKey]) {
             try {
-                await createdDatabases[this.databaseKey];
-                
+                await createdDatabases[this.databaseKey];       
                 return;
             } catch (error) {
                 // If the previous attempt failed, we'll try again
@@ -35,6 +36,7 @@ export class DatabaseManager {
 
         try {
             await createdDatabases[this.databaseKey];
+            migrationService.runMigrations();
         } catch (error) {
             // Clean up on error
             delete createdDatabases[this.databaseKey];

@@ -33,7 +33,7 @@ import { IContainerResult } from '../interfaces/IContainerResult';
 import { IJwtConfig } from '../types';
 
 export async function container(
-  config?: Partial<IJwtConfig>,
+  config?: IJwtConfig,
   use_redis?: boolean,
   redis_url?: string
 ): Promise<IContainerResult> {

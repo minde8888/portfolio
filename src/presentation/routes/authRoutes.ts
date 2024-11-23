@@ -9,7 +9,7 @@ import { IJwtConfig } from "../../infrastructure/types";
 import { loginSchema, registerSchema } from "../validation/validateRequest";
 import { isDeletedMiddleware } from "../middlewares/deletedEntityMiddleware";
 
-export default async (router: Router, config?: Partial<IJwtConfig>): Promise<void> => {
+export default async (router: Router, config?: IJwtConfig): Promise<void> => {
   
   const { authController }: IContainerResult = await container(config);
   const validateBody = (schema: any) => expressYupMiddleware({
