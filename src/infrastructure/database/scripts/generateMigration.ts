@@ -16,8 +16,6 @@ const command = `typeorm-ts-node-commonjs migration:generate ` +
   `-d "${configPath}" ` +
   `"${path.join(migrationsDir, migrationName)}"`;
 
-console.log(`Executing command: ${command}`);
-
 try {
   const output = execSync(command, { 
     encoding: 'utf-8',

@@ -42,8 +42,6 @@ export class JwtAuthService implements IAuthService {
 
   async validateUser(email: string, password: string): Promise<Auth | null> {
     try {
-      console.log(email, password);
-
       const user = await this.authRepository.findByEmail(email);
 
       if (!user) {
@@ -94,8 +92,6 @@ export class JwtAuthService implements IAuthService {
 
   private async verifyToken(token: string, secret: string): Promise<IDecodedToken> {
     try {
-      console.log("token", token);
-      console.log("secret", secret);
       return jwt.verify(token, secret) as IDecodedToken;
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError || error instanceof jwt.JsonWebTokenError) {

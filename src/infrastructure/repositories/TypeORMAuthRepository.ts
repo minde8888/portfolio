@@ -25,7 +25,7 @@ export class TypeORMAuthRepository extends BaseRepository<AuthEntity, Auth> impl
             auth.name,
             auth.password
         );
-        
+
         const result = await super.create(newAuth);
 
         return result;

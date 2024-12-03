@@ -48,7 +48,6 @@
     "clean:dist": "npx rimraf dist",
     "clean": "rimraf dist node_modules package-lock.json",
     "build:tsup": "tsup src/index.ts --format cjs,esm --dts --metafile",
-    "build": "node build.mjs",
     "rebuild": "npm run clean && npm install && npm run build",
     "prepublishOnly": "npm run build",
     "start:dev": "ts-node -r tsconfig-paths/register --files src/index.ts",

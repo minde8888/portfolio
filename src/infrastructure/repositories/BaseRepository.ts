@@ -39,7 +39,6 @@ export abstract class BaseRepository<T extends ObjectLiteral, D> implements IBas
         const entity = await this.repository.findOne({
             where: { [entityField]: value } as any
         });
-        console.log(entity);
 
         if (entity) {
             throw new EmailAlreadyExistsError();
