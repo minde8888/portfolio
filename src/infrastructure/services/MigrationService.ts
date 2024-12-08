@@ -4,7 +4,7 @@ import { DataSource } from "typeorm";
 
 import { MigrationExecutor } from "typeorm";
 
-import { AppDataSource } from "../database/config"
+import { AppDataSource } from "../database/config/config"
 
 export class MigrationService {
     private dataSource: DataSource

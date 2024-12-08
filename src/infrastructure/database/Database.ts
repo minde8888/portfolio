@@ -2,7 +2,7 @@ import "reflect-metadata";
 import "dotenv/config";
 import { DataSource } from 'typeorm';
 import { IDatabase } from "../interfaces/IDatabase";
-import { createDataSource } from "./config";
+import { createDataSource } from "./config/config";
 import { IServerConfig } from "../../types/IServerConfig";
 import { IDatabaseConfig } from "../../types/IDatabaseConfig";
 import { DatabaseManager } from "./utils/DatabaseManager";

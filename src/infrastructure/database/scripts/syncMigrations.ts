@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { AppDataSource } from '../config';
+import { AppDataSource } from '../config/config';
 
 async function syncMigrations() {
     await AppDataSource.initialize();
